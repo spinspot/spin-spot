@@ -11,22 +11,22 @@ interface TournamentParams {
 
 export default function TournamentInfo({
     params,
-}: {
+  }: {
     params: TournamentParams;
-}) {
+  }) {
     const router = useRouter();
     const tournament = useTournament(params.tournamentId);
     const tournamentData = tournament.data;
-
+  
     const { data: participants, isLoading } = useTournamentParticipants(params.tournamentId);
-
+  
     if (isLoading) {
         return <Loader />;
     }
-
+  
     const renderParticipants = () => {
         if (!tournamentData || !participants) return null;
-
+  
         if (tournamentData.eventType === "1V1") {
             return (
                 <table className="w-full table-auto m-4">
@@ -72,12 +72,12 @@ export default function TournamentInfo({
                 </table>
             );
         }
-
+  
         return null;
     };
-
+  
     return (
-        <div className="font-body h-screen flex-grow py-20 justify-center items-center text-center ">
+        <div className="font-body flex-grow py-20 justify-center items-center text-center ">
             <h1 className="flex flex-col text-3xl font-bold">Información del Torneo 🏆</h1>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <h2 className="font-semibold text-2xl my-4">{tournamentData?.name.toUpperCase()}</h2>
@@ -156,25 +156,24 @@ export default function TournamentInfo({
             <div className="flex justify-center items-center mt-4 gap-4">
                 {renderParticipants()}
             </div>
-                
             <div className="flex justify-center items-center mt-8 gap-5 pb-4">
                 <Button 
                     className="btn-primary "
                     label="Volver a Torneos"
                     onClick={() => router.push(`/tournaments`)}
-                    />
+                />
                 <Button
                     className="btn-primary"
                     label="Editar Torneo"
-                    onClick={() => console.log('Editar Torneo')}
+                    onClick={() => router.push(`/tournaments/update-tournament/${params.tournamentId}`)}
                 />
                 <Button
                     className="btn-secondary"
                     label="Eliminar Torneo"
                     onClick={()=>console.log('Eliminar Torneo')}
-                    />
-
+                />
             </div>
         </div>
-            );
-}
+    );
+  }
+  

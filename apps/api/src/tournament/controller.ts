@@ -41,6 +41,22 @@ async function getTournament(req: Request, res: Response) {
 async function updateTournament(req: Request, res: Response) {
   const params = updateTournamentParamsDefinition.parse(req.params);
   const input = updateTournamentInputDefinition.parse(req.body);
+
+  const currentTime = new Date();
+  if (currentTime > (input.startTime ?? new Date())) {
+    throw new ApiError({
+      status: 400,
+      errors: [{ message: "Fecha invalida para crear el torneo" }],
+    });
+  }
+
+  if ((input.startTime ?? new Date()) >  (input.endTime ?? new Date())) {
+
+    throw new ApiError({
+      status: 400,
+      errors: [{ message: "La fecha de finalización no puede ser antes que la de inicio" }],
+  })
+};
   const tournament = await tournamentService.updateTournament(
     params._id,
     input,
@@ -48,12 +64,12 @@ async function updateTournament(req: Request, res: Response) {
   return res.status(200).json(tournament);
 }
 
-async function leaveTournament(req:Request, res: Response) {
+async function leaveTournament(req: Request, res: Response) {
   const user = req.user;
   const params = updateTournamentParamsDefinition.parse(req.params);
   const tournament = await tournamentService.getTournament(params._id);
 
-  if(user && tournament && tournament.players && tournament.eventType === "1V1"){
+  if (user && tournament && tournament.players && tournament.eventType === "1V1") {
     const playerIndex = tournament.players.findIndex(
       (data) => data._id.toString() === user._id.toString()
     );
@@ -63,17 +79,17 @@ async function leaveTournament(req:Request, res: Response) {
         players: tournament.players.map((player) => player._id),
       });
     }
-  } else if (user && tournament && tournament.teams && tournament.eventType === "2V2"){
+  } else if (user && tournament && tournament.teams && tournament.eventType === "2V2") {
     const team = tournament.teams.find((team) => team.players.some((player) => player._id.toString() === user._id.toString()));
     const teamIndex = tournament.teams.findIndex(
       (data) => data._id.toString() === team?._id.toString()
     );
-    if(teamIndex !== -1){
+    if (teamIndex !== -1) {
       tournament.teams.splice(teamIndex, 1);
       await tournamentService.updateTournament(params._id, {
         teams: tournament.teams.map((team) => team._id),
       });
-    }  
+    }
   }
   return res.status(200).json(tournament);
 }
@@ -92,7 +108,7 @@ async function joinTournament(req: Request, res: Response) {
       !tournament.players.some(
         (player) => player.toString() === user._id.toString(),
       )
-    ){
+    ) {
       const updatePlayers = [...tournament.players.map((player) => player._id), user._id];
       await tournamentService.updateTournament(params._id, {
         players: updatePlayers,
