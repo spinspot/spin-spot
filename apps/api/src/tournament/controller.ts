@@ -41,12 +41,27 @@ async function getTournament(req: Request, res: Response) {
 async function updateTournament(req: Request, res: Response) {
   const params = updateTournamentParamsDefinition.parse(req.params);
   const input = updateTournamentInputDefinition.parse(req.body);
+  const currentTournament = await tournamentService.getTournament(params._id);
 
   const currentTime = new Date();
   if (currentTime > (input.startTime ?? new Date())) {
     throw new ApiError({
       status: 400,
       errors: [{ message: "Fecha invalida para crear el torneo" }],
+    });
+  }
+
+  if (currentTournament?.eventType === "1V1" && (currentTournament?.players?.length ?? 0) > (input.maxPlayers ?? 0)) {
+    throw new ApiError({
+      status: 400,
+      errors: [{ message: "No puedes reducir el número de jugadores" }],
+    });
+  }
+
+  if (currentTournament?.eventType === "2V2" && (currentTournament?.teams?.length ?? 0) > (input.maxTeams ?? 0)) {
+    throw new ApiError({
+      status: 400,
+      errors: [{ message: "No puedes reducir el número de equipos" }],
     });
   }
 
@@ -57,6 +72,8 @@ async function updateTournament(req: Request, res: Response) {
       errors: [{ message: "La fecha de finalización no puede ser antes que la de inicio" }],
   })
 };
+
+  
   const tournament = await tournamentService.updateTournament(
     params._id,
     input,
