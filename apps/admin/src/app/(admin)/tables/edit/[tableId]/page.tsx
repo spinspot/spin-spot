@@ -115,7 +115,7 @@ export default function editTableAdmin({
               className={cn(
                 "select-primary",
                 errors.isActive
-                  ? "dark:text-base-300 input-error"
+                  ? "dark:text-base-300 select-error"
                   : "dark:text-base-300",
               )}
               bottomLeftLabel={errors.isActive?.message}
@@ -131,7 +131,7 @@ export default function editTableAdmin({
               />
               <Button
                 className="btn-md btn-link text-secondary mx-auto !no-underline"
-                label="Volver"
+                label="Ir a mesas"
                 labelSize="text-md"
                 onClick={handleBackClick}
               />

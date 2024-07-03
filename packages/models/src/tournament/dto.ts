@@ -11,9 +11,13 @@ import { IPopulatedTeam } from "../team";
 import { IUser } from "../user";
 
 export const tournamentDefinition = baseModelDefinition.extend({
-  name: z.string(),
-  description: z.string(),
-  owner: z.instanceof(Types.ObjectId).or(z.string().refine(isValidObjectId)),
+  name: z.string().nonempty("El nombre no puede estar vacío"),
+  description: z.string().nonempty("La descripción no puede estar vacío"),
+  owner: z
+    .instanceof(Types.ObjectId)
+    .or(z.string().refine(isValidObjectId))
+    .optional(),
+
   players: z
     .array(z.instanceof(Types.ObjectId).or(z.string().refine(isValidObjectId)))
     .optional(),
@@ -22,10 +26,18 @@ export const tournamentDefinition = baseModelDefinition.extend({
     .optional(),
   maxPlayers: z.number().optional(),
   maxTeams: z.number().optional(),
-  prize: z.string(),
+  prize: z.string().refine(
+    (value) => {
+      const numberValue = parseFloat(value);
+      return !isNaN(numberValue) && numberValue > 0;
+    },
+    {
+      message: "El premio debe ser un número positivo",
+    },
+  ),
   eventType: eventTypeDefinition,
   status: statusTournamentTypeDefinition,
-  location: z.string(),
+  location: z.string().optional(),
   tournamentType: tournamentLevelTypeDefinition,
   tournamentFormat: tournamentFormatTypeDefinition,
   startTime: z.coerce.date(),

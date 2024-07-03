@@ -5,15 +5,25 @@ import { useState } from "react";
 import { DayPicker } from "react-day-picker";
 
 const today = new Date();
+console.log(today);
 const fromMonth = new Date(today.getFullYear(), today.getMonth());
-const startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+const todayDate = new Date(
+  today.getFullYear(),
+  today.getMonth(),
+  today.getDate(),
+);
 
 interface CalendarProps {
   onDateChange: (_date: Date | undefined) => void;
   endDate?: Date;
+  startDate?: Date;
 }
 
-export function Calendar({ onDateChange, endDate }: CalendarProps) {
+export function Calendar({
+  onDateChange,
+  endDate,
+  startDate = todayDate,
+}: CalendarProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   const handleDateChange = (newDate: Date | undefined) => {
@@ -24,10 +34,13 @@ export function Calendar({ onDateChange, endDate }: CalendarProps) {
   };
 
   const disablePastDates = (date: Date): boolean => {
-    if (endDate){
-    return date < startDate || date > endDate ;
+    if (endDate) {
+      return date < todayDate || date > endDate;
     }
-    return date < startDate;
+    if (startDate) {
+      return date < startDate;
+    }
+    return date < todayDate;
   };
 
   return (
@@ -42,7 +55,7 @@ export function Calendar({ onDateChange, endDate }: CalendarProps) {
           fromMonth={fromMonth}
           classNames={{
             caption: "flex justify-center py-2 m-4 relative items-center",
-            caption_label: "text-lg font-bold",
+            caption_label: "text-lg font-bold dark:text-base-300",
             nav: "flex items-center",
             nav_button_previous: "absolute left-1.5",
             nav_button_next: "absolute right-1.5",
@@ -62,10 +75,16 @@ export function Calendar({ onDateChange, endDate }: CalendarProps) {
           }}
           components={{
             IconLeft: ({ ...props }) => (
-              <ChevronLeftIcon {...props} className="h-4 w-4 stroke-2" />
+              <ChevronLeftIcon
+                {...props}
+                className="dark:text-base-300 h-4 w-4 stroke-2"
+              />
             ),
             IconRight: ({ ...props }) => (
-              <ChevronRightIcon {...props} className="h-4 w-4 stroke-2" />
+              <ChevronRightIcon
+                {...props}
+                className="dark:text-base-300 h-4 w-4 stroke-2"
+              />
             ),
           }}
         />
@@ -73,4 +92,3 @@ export function Calendar({ onDateChange, endDate }: CalendarProps) {
     </div>
   );
 }
-

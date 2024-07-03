@@ -109,7 +109,7 @@ export default function Dashboard() {
         />
       </div>
       <div className="font-title w-full pt-6 text-center font-normal">
-        <h2 className="h-10 text-2xl">Torneos activos</h2>
+        <h2 className="h-10 text-2xl font-bold">Torneos activos</h2>
       </div>
       <div className="p-4">
         <div
@@ -141,7 +141,7 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="font-title w-full  text-center font-normal">
-        <h2 className="h-10 text-2xl">Reservas activas</h2>
+        <h2 className="h-10 text-2xl font-bold">Reservas activas</h2>
       </div>
       <div className="p-4">
         <div

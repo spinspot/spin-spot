@@ -8,6 +8,14 @@ export default function Tables() {
   const router = useRouter();
   const { data: tables, isLoading } = useTables();
 
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader variant="dots" size="lg" className="text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex-grow">
       <div className="font-title mt-3 text-center font-bold">
@@ -26,23 +34,19 @@ export default function Tables() {
           {tables ? tables?.filter((table) => table.isActive).length : 0}
         </div>
       </div>
-      <div className="my-6 flex justify-center">
+      <div className="my-6 flex justify-center p-5">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {isLoading ? (
-            <Loader />
-          ) : (
-            tables?.map((table, index) => (
-              <Card
-                key={index}
-                labelName={`Mesa ${table.code}`}
-                label={`Mesa ${table.isActive ? "Activa" : "Inactiva"}`}
-                labelButton="Editar Mesa"
-                image={true}
-                imageSrc="/pingPongTable.svg"
-                onClick={() => router.push(`tables/edit/${table._id}`)}
-              />
-            ))
-          )}
+          {tables?.map((table, index) => (
+            <Card
+              key={index}
+              labelName={`Mesa ${table.code}`}
+              label={`Mesa ${table.isActive ? "Activa" : "Inactiva"}`}
+              labelButton="Editar Mesa"
+              image={true}
+              imageSrc="/pingPongTable.svg"
+              onClick={() => router.push(`tables/edit/${table._id}`)}
+            />
+          ))}
         </div>
       </div>
     </div>
