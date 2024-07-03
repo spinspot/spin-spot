@@ -41,6 +41,10 @@ export function Header({ isAdmin = false }: HeaderProps) {
     router.push("/tournaments");
   };
 
+  const handleUsersClick = () => {
+    router.push("/users");
+  };
+
   return (
     <div className="navbar bg-base-200">
       <div className="navbar-start">
@@ -73,10 +77,13 @@ export function Header({ isAdmin = false }: HeaderProps) {
                 <a onClick={handleTablesClick}>Gestión de Mesas</a>
               </li>
               <li>
+                <a onClick={handleTournamentsClick}>Gestión de Torneos</a>
+              </li>
+              <li>
                 <a onClick={handleReservesClick}>Gestión de Reservas</a>
               </li>
               <li>
-                <a onClick={handleTournamentsClick}>Gestión de Torneos</a>
+                <a onClick={handleUsersClick}>Gestión de Usuarios</a>
               </li>
             </ul>
           ) : (

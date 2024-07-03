@@ -79,6 +79,14 @@ export default function editTableAdmin({
     }
   }, [table.data, setValue]);
 
+  if (table.isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader variant="dots" size="lg" className="text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="font-body flex-grow py-32">
       <div className="font-title text-center font-bold">
@@ -87,57 +95,49 @@ export default function editTableAdmin({
         </h1>
       </div>
       <div className="text-primary mx-auto mt-4 flex max-w-md flex-col items-center gap-y-4 max-sm:px-8">
-        {table.isLoading ? (
-          <div className="mt-14 flex items-center justify-center">
-            <Loader size="lg" variant="dots" className="text-primary"></Loader>
-          </div>
-        ) : (
-          <>
-            <TextInput
-              placeholder="Código..."
-              topRightLabel="Código de la mesa"
-              iconLeft={
-                <CalculatorIcon className="text-primary dark:text-neutral h-6 w-6" />
-              }
-              {...register("code")}
-              className={
-                errors.code
-                  ? "dark:text-base-300 input-error"
-                  : "dark:text-base-300"
-              }
-              bottomLeftLabel={errors.code?.message}
-            />
-            <SelectInput
-              options={["ACTIVA", "INACTIVA"]}
-              defaultOption="Seleccione actividad"
-              topRightLabel="Actividad"
-              {...register("isActive")}
-              className={cn(
-                "select-primary",
-                errors.isActive
-                  ? "dark:text-base-300 input-error"
-                  : "dark:text-base-300",
-              )}
-              bottomLeftLabel={errors.isActive?.message}
-            />
-            <div
-              className={`${errors.isActive ? "mt-2" : "mt-4"} flex w-full flex-col gap-3`}
-            >
-              <Button
-                className="btn-md btn-primary"
-                label="Editar Mesa"
-                labelSize="text-md"
-                onClick={handleSubmit(handleUpdateTable)}
-              />
-              <Button
-                className="btn-md btn-link text-secondary mx-auto !no-underline"
-                label="Volver"
-                labelSize="text-md"
-                onClick={handleBackClick}
-              />
-            </div>
-          </>
-        )}
+        <TextInput
+          placeholder="Código..."
+          topRightLabel="Código de la mesa"
+          iconLeft={
+            <CalculatorIcon className="text-primary dark:text-neutral h-6 w-6" />
+          }
+          {...register("code")}
+          className={
+            errors.code
+              ? "dark:text-base-300 input-error"
+              : "dark:text-base-300"
+          }
+          bottomLeftLabel={errors.code?.message}
+        />
+        <SelectInput
+          options={["ACTIVA", "INACTIVA"]}
+          defaultOption="Seleccione actividad"
+          topRightLabel="Actividad"
+          {...register("isActive")}
+          className={cn(
+            "select-primary",
+            errors.isActive
+              ? "dark:text-base-300 select-error"
+              : "dark:text-base-300",
+          )}
+          bottomLeftLabel={errors.isActive?.message}
+        />
+        <div
+          className={`${errors.isActive ? "mt-2" : "mt-4"} flex w-full flex-col gap-3`}
+        >
+          <Button
+            className="btn-md btn-primary"
+            label="Editar Mesa"
+            labelSize="text-md"
+            onClick={handleSubmit(handleUpdateTable)}
+          />
+          <Button
+            className="btn-md btn-link text-secondary mx-auto !no-underline"
+            label="Ir a Mesas"
+            labelSize="text-md"
+            onClick={handleBackClick}
+          />
+        </div>
       </div>
     </div>
   );

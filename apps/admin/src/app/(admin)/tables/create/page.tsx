@@ -50,8 +50,23 @@ export default function createTableAdmin() {
           });
           router.push("/tables");
         },
+        onError: () => {
+          showToast({
+            label: "Ha ocurrido un error al crear la mesa",
+            type: "error",
+            duration: 3000,
+          });
+        },
       },
     );
+  };
+
+  const handleFormError = () => {
+    showToast({
+      label: "Por favor, corrige los errores en el formulario",
+      type: "error",
+      duration: 3000,
+    });
   };
 
   return (
@@ -84,7 +99,7 @@ export default function createTableAdmin() {
           className={cn(
             "select-primary",
             errors.isActive
-              ? "dark:text-base-300 input-error"
+              ? "dark:text-base-300 select-error"
               : "dark:text-base-300",
           )}
           bottomLeftLabel={errors.isActive?.message}
@@ -96,7 +111,7 @@ export default function createTableAdmin() {
             className="btn-md btn-primary"
             label="Crear Mesa"
             labelSize="text-md"
-            onClick={handleSubmit(handleCreateTable)}
+            onClick={handleSubmit(handleCreateTable, handleFormError)}
           />
           <Button
             className="btn-md btn-link text-secondary mx-auto !no-underline"

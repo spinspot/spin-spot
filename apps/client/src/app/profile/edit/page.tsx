@@ -118,7 +118,10 @@ export default function EditProfile() {
             defaultOption="Elige tu Género"
             topRightLabel="Género"
             {...register("gender")}
-            className={cn("select-primary", errors.gender ? "input-error" : "")}
+            className={cn(
+              "select-primary",
+              errors.gender ? "select-error" : "",
+            )}
             bottomLeftLabel={errors.gender?.message}
           />
         </div>

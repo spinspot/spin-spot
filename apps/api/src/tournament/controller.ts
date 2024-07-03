@@ -41,10 +41,66 @@ async function getTournament(req: Request, res: Response) {
 async function updateTournament(req: Request, res: Response) {
   const params = updateTournamentParamsDefinition.parse(req.params);
   const input = updateTournamentInputDefinition.parse(req.body);
-  const tournament = await tournamentService.updateTournament(
-    params._id,
-    input,
-  );
+  const currentTournament = await tournamentService.getTournament(params._id);
+
+  const currentTime = new Date();
+  if (currentTime > (input.startTime ?? new Date())) {
+    throw new ApiError({
+      status: 400,
+      errors: [{ message: "Fecha invalida para crear el torneo" }],
+    });
+  }
+
+  if (currentTournament?.eventType === "1V1") {
+    const currentPlayersCount = currentTournament?.players?.length ?? 0;
+    const maxPlayers = input.maxPlayers;
+
+    if (maxPlayers !== undefined) {
+      if (maxPlayers <= 0) {
+        throw new ApiError({
+          status: 400,
+          errors: [{ message: "El número máximo de jugadores debe ser mayor que cero" }],
+        });
+      }
+
+      if (currentPlayersCount > maxPlayers) {
+        throw new ApiError({
+          status: 400,
+          errors: [{ message: `No puedes reducir el número de jugadores a menos de ${currentPlayersCount}` }],
+        });
+      }
+    }
+  }
+
+  if (currentTournament?.eventType === "2V2") {
+    const currentTeamsCount = currentTournament?.teams?.length ?? 0;
+    const maxTeams = input.maxTeams;
+
+    if (maxTeams !== undefined) {
+      if (maxTeams <= 0) {
+        throw new ApiError({
+          status: 400,
+          errors: [{ message: "El número máximo de equipos debe ser mayor que cero" }],
+        });
+      }
+
+      if (currentTeamsCount > maxTeams) {
+        throw new ApiError({
+          status: 400,
+          errors: [{ message: `No puedes reducir el número de equipos a menos de ${currentTeamsCount}` }],
+        });
+      }
+    }
+  }
+
+  if ((input.startTime ?? new Date()) > (input.endTime ?? new Date())) {
+    throw new ApiError({
+      status: 400,
+      errors: [{ message: "La fecha de finalización no puede ser antes que la de inicio" }],
+    });
+  }
+
+  const tournament = await tournamentService.updateTournament(params._id, input);
   return res.status(200).json(tournament);
 }
 
@@ -53,12 +109,7 @@ async function leaveTournament(req: Request, res: Response) {
   const params = updateTournamentParamsDefinition.parse(req.params);
   const tournament = await tournamentService.getTournament(params._id);
 
-  if (
-    user &&
-    tournament &&
-    tournament.players &&
-    tournament.eventType === "1V1"
-  ) {
+  if (user && tournament && tournament.players && tournament.eventType === "1V1") {
     const playerIndex = tournament.players.findIndex(
       (data) => data._id.toString() === user._id.toString(),
     );
@@ -68,19 +119,10 @@ async function leaveTournament(req: Request, res: Response) {
         players: tournament.players.map((player) => player._id),
       });
     }
-  } else if (
-    user &&
-    tournament &&
-    tournament.teams &&
-    tournament.eventType === "2V2"
-  ) {
-    const team = tournament.teams.find((team) =>
-      team.players.some(
-        (player) => player._id.toString() === user._id.toString(),
-      ),
-    );
+  } else if (user && tournament && tournament.teams && tournament.eventType === "2V2") {
+    const team = tournament.teams.find((team) => team.players.some((player) => player._id.toString() === user._id.toString()));
     const teamIndex = tournament.teams.findIndex(
-      (data) => data._id.toString() === team?._id.toString(),
+      (data) => data._id.toString() === team?._id.toString()
     );
     if (teamIndex !== -1) {
       tournament.teams.splice(teamIndex, 1);
@@ -107,10 +149,7 @@ async function joinTournament(req: Request, res: Response) {
         (player) => player.toString() === user._id.toString(),
       )
     ) {
-      const updatePlayers = [
-        ...tournament.players.map((player) => player._id),
-        user._id,
-      ];
+      const updatePlayers = [...tournament.players.map((player) => player._id), user._id];
       await tournamentService.updateTournament(params._id, {
         players: updatePlayers,
       });

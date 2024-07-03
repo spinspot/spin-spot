@@ -48,3 +48,13 @@ export function useTournamentParticipants(
     queryFn: () => getTournamentParticipants(_id),
   });
 }
+
+export async function getNotClosedTournaments() {
+  const res = await api.get(`/tournaments`);
+  const tournaments: IPopulatedTournament[] = await res.json();
+  return tournaments.filter(tournament => tournament.status !== 'FINISHED');
+}
+
+export function useNotClosedTournaments(){
+  return useQuery({ queryKey: ["getNotClosedTournaments"], queryFn: getNotClosedTournaments });
+}
