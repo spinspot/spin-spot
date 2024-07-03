@@ -2,6 +2,7 @@ import {
   IPopulatedTournament,
   TCreateTournamentInputDefinition,
   TGetTournamentsQueryDefinition,
+  TGetUsersQueryDefinition,
   TUpdateTournamentInputDefinition,
   TUpdateTournamentParamsDefinition,
   tournamentSchema,
@@ -83,10 +84,29 @@ async function getParticipants(_id: TGetTournamentsQueryDefinition["_id"]) {
   }
 }
 
+async function getUserTournaments(userId: TGetUsersQueryDefinition["_id"]) {
+  const tournaments = await Tournament.find({
+    $or: [
+      { players: userId },
+      { "teams.players": userId },
+    ],
+  }).populate([
+    "players",
+    {
+      path: "teams",
+      populate: {
+        path: "players",
+      },
+    },
+  ]);
+  return tournaments;
+}
+
 export const tournamentService = {
   createTournament,
   getTournament,
   getTournaments,
   updateTournament,
   getParticipants,
+  getUserTournaments,
 } as const;
