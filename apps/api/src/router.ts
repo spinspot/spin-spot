@@ -24,4 +24,7 @@ router.use("/teams", teamRouter);
 router.use("/tournament-matches", tournamentMatchRouter);
 router.use("/invitations", invitationRouter);
 
+/* Cron job */
+router.use("/api/time-blocks", timeBlockRouter);
+
 export { router };
