@@ -18,7 +18,7 @@ export default function Tournaments() {
 
   return (
     <div className="flex-grow">
-      <div className="font-title mt-3 text-center font-bold">
+      <div className="font-title mt-8 text-center font-bold">
         <h1 className="flex flex-col text-3xl">
           <span>Torneos SpinSpot</span>
         </h1>
