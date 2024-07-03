@@ -7,15 +7,15 @@ import {
   useBookingsByOwner,
   useBookingsByPlayer,
   useLeaveBooking,
+  useNotClosedTournaments,
   useToast,
-  useTournaments,
 } from "@spin-spot/services";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const router = useRouter();
-  const tournaments = useTournaments();
+  const tournaments = useNotClosedTournaments();
   const userBookings = useBookingsByOwner(user?._id || "");
   console.log(userBookings.data && userBookings.data[0]?.timeBlock);
   const playerBookings = useBookingsByPlayer(user?._id || "");

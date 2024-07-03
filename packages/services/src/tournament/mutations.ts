@@ -52,6 +52,7 @@ export function useUpdateTournament() {
     onSuccess(data) {
       queryClient.invalidateQueries({ queryKey: ["getTournaments"] });
       queryClient.invalidateQueries({ queryKey: ["getTournament", data._id] });
+      queryClient.invalidateQueries({ queryKey: ["getNotClosedTournaments"]}); 
     },
   });
 }
