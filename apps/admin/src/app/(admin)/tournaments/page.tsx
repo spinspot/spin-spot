@@ -2,11 +2,11 @@
 
 import { Button, Card, Loader } from "@spin-spot/components";
 import { useRouter } from "next/navigation";
-import { useTournaments } from "@spin-spot/services";
+import { useNotClosedTournaments} from "@spin-spot/services";
 
 export default function Tournaments() {
   const router = useRouter();
-  const { data: tournaments, isLoading } = useTournaments();
+  const { data: tournaments, isLoading } = useNotClosedTournaments();
 
   return (
     <div className="flex-grow">

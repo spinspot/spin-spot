@@ -52,8 +52,8 @@ export default function UpdateTournament({
     // Adjust dates to ensure correct timezone
     const adjustedData = {
       ...data,
-      startTime: adjustDateToUTC(data.startTime) as unknown as Date,
-      endTime: adjustDateToUTC(data.endTime) as unknown as Date,
+      startTime: adjustDateToUTC(data.startTime?.toString()),
+      endTime: adjustDateToUTC(data.endTime?.toString()),
     };
 
     if (tournament.data) {
@@ -86,20 +86,16 @@ export default function UpdateTournament({
       setValue("description", tournament.data.description);
       setValue("tournamentFormat", tournament.data.tournamentFormat);
       setValue("prize", tournament.data.prize);
-  
-      const formatDateToUTC = (date: Date | undefined) => {
-        if (!date) return "";
-        const utcDate = new Date(date);
-        utcDate.setMinutes(utcDate.getMinutes() + utcDate.getTimezoneOffset());
-        return format(utcDate, "yyyy-MM-dd");
+
+      const formatDateToInput = (date: string | undefined) => {
+        if (!date) return undefined;
+        return format(new Date(date), "yyyy-MM-dd");
       };
-  
-      const formattedStartTime = formatDateToUTC(new Date(tournament.data.startTime));
-      const formattedEndTime = formatDateToUTC(new Date(tournament.data.endTime));
-  
-      setValue("startTime", formattedStartTime as unknown as Date);
-      setValue("endTime", formattedEndTime as unknown as Date);
-  
+
+      // Set formatted date values
+      setValue("startTime", formatDateToInput(tournament.data.startTime?.toString()) as unknown as Date);
+      setValue("endTime", formatDateToInput(tournament.data.endTime?.toString()) as unknown as Date);
+
       if (tournament.data.eventType === "2V2") {
         setValue("maxTeams", tournament.data.maxTeams);
       } else if (tournament.data.eventType === "1V1") {
@@ -108,10 +104,10 @@ export default function UpdateTournament({
     }
   }, [tournament.data, setValue]);
 
-  const adjustDateToUTC = (date: string | Date | undefined): string | undefined => {
+  const adjustDateToUTC = (date: string | undefined): Date | undefined => {
     if (!date) return undefined;
     const utcDate = new Date(date);
-    return new Date(Date.UTC(utcDate.getFullYear(), utcDate.getMonth(), utcDate.getDate())).toISOString();
+    return new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate());
   };
 
   return (
@@ -219,6 +215,9 @@ export default function UpdateTournament({
     </div>
   );
 }
+
+
+
 
 
 

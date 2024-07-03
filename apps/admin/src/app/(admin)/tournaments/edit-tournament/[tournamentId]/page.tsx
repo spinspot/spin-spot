@@ -2,7 +2,7 @@
 
 import { Badge, Button, Countdown, Loader, PingPongIcon } from "@spin-spot/components";
 import { useRouter } from "next/navigation";
-import { useTournament, useTournamentParticipants } from "@spin-spot/services";
+import { useUpdateTournament, useTournament, useTournamentParticipants, useToast } from "@spin-spot/services";
 import { BanknotesIcon, BuildingLibraryIcon, CalendarDaysIcon, TrophyIcon } from "@heroicons/react/24/outline";
 
 interface TournamentParams {
@@ -17,12 +17,56 @@ export default function TournamentInfo({
     const router = useRouter();
     const tournament = useTournament(params.tournamentId);
     const tournamentData = tournament.data;
+    const updateTournament = useUpdateTournament();
+    const { showToast } = useToast();
   
     const { data: participants, isLoading } = useTournamentParticipants(params.tournamentId);
   
     if (isLoading) {
         return <Loader />;
     }
+
+    const handleDeleteTournament = () => {
+        if (!tournamentData) return;
+
+        updateTournament.mutate(
+            { _id: tournamentData._id, status: "FINISHED" },
+            {
+                onSuccess: () => {
+                    showToast({
+                        label: "El torneo ha sido marcado como terminado.",
+                        type: "success",
+                        duration: 3000,
+                    });
+                    router.push("/tournaments");
+                },
+                onError: (error) => {
+                    showToast({
+                        label: error.message,
+                        type: "error",
+                        duration: 3000,
+                    });
+                },
+            }
+        );
+    };
+
+    const confirmDeleteTournament = () => {
+        showToast({
+            label: "¿Estás seguro de que deseas eliminar este torneo?",
+            type: "warning",
+            acceptButtonLabel: "Sí",
+            denyButtonLabel: "No",
+            onAccept: handleDeleteTournament,
+            onDeny: () => {
+                showToast({
+                    label: "Eliminación cancelada",
+                    type: "info",
+                    duration: 2000,
+                });
+            },
+        });
+    };
   
     const renderParticipants = () => {
         if (!tournamentData || !participants) return null;
@@ -170,10 +214,11 @@ export default function TournamentInfo({
                 <Button
                     className="btn-secondary"
                     label="Eliminar Torneo"
-                    onClick={()=>console.log('Eliminar Torneo')}
+                    onClick={confirmDeleteTournament}
                 />
             </div>
         </div>
     );
   }
+
   
