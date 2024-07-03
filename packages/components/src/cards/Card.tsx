@@ -8,6 +8,7 @@ interface CardProps {
   classNameButton?: string;
   labelButton?: string | React.ReactNode;
   image?: boolean;
+  imageSrc?: string;
   onClick?: () => void;
 }
 
@@ -18,14 +19,15 @@ export function Card({
   onClick,
   className,
   classNameButton = "btn-primary",
-  image = true,
+  image = false,
+  imageSrc,
 }: CardProps) {
   return (
     <>
-      <div className={cn("card w-72 break-all shadow-xl", className)}>
+      <div className={cn("card max-w-72 break-all shadow-xl", className)}>
         {image && (
           <figure className="h-50">
-            <img src="/tournamentBackGround.svg" alt="Shoes" />
+            <img src={imageSrc} alt="Img" />
           </figure>
         )}
         <div className="card-body p-5">

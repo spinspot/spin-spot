@@ -2,7 +2,7 @@
 
 import { MapPinIcon } from "@heroicons/react/24/outline";
 import { Button } from "@spin-spot/components";
-import { useAuth } from "@spin-spot/services";
+import { useAuth, useBookingsByOwner, useBookingsByPlayer, useUserTournaments } from "@spin-spot/services";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useScrollLock } from "usehooks-ts";
@@ -11,6 +11,11 @@ export default function Profile() {
   useScrollLock();
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useAuth();
+  const Tournaments = useUserTournaments(user?._id ?? "")
+  const totalTournaments = Tournaments.data?.length ?? 0;
+  const activeOwnerBookings = useBookingsByOwner(user?._id ?? "");
+  const activePlayerBookings = useBookingsByPlayer(user?._id ?? "");
+  const totalBookings = (activeOwnerBookings.data?.length ?? 0) + (activePlayerBookings.data?.length ?? 0 );
 
   const handleEditClick = () => {
     router.push("/profile/edit");
@@ -55,13 +60,13 @@ export default function Profile() {
         <div className="mt-4 flex justify-center gap-6">
           <div className="text-center">
             <p className="text-secondary text-lg font-semibold dark:text-white">
-              {0}
+              {totalBookings}
             </p>
-            <p className="text-neutral text-sm">Reservas</p>
+            <p className="text-neutral text-sm">Reservas Activas</p>
           </div>
           <div className="text-center">
             <p className="text-secondary text-lg font-semibold dark:text-white">
-              {0}
+              {totalTournaments}
             </p>
             <p className="text-neutral text-sm">Torneos</p>
           </div>

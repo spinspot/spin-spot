@@ -1,13 +1,13 @@
 "use client";
 
 import { Card, Loader } from "@spin-spot/components";
-import { useTournaments } from "@spin-spot/services";
+import { useNotClosedTournaments } from "@spin-spot/services";
 import { useRouter } from "next/navigation";
 
 export default function Tournament() {
   const router = useRouter();
 
-  const tournaments = useTournaments();
+  const tournaments = useNotClosedTournaments();
   const tournamentsBeginner = tournaments.data?.filter(
     (tournament) => tournament.tournamentType === "BEGINNER",
   );
@@ -65,6 +65,8 @@ export default function Tournament() {
                   labelButton="Jugar"
                   onClick={() => handlePlay(`${tournament._id}`)}
                   className="carousel-item"
+                  image={true}
+                  imageSrc="/tournamentBackGround.svg"
                 />
               ))
             ) : (
@@ -97,6 +99,8 @@ export default function Tournament() {
                   labelButton="Jugar"
                   onClick={() => handlePlay(`${tournament._id}`)}
                   className="carousel-item"
+                  image={true}
+                  imageSrc="/tournamentBackGround.svg"
                 />
               ))
             ) : (
@@ -129,6 +133,8 @@ export default function Tournament() {
                   labelButton="Jugar"
                   onClick={() => handlePlay(`${tournament._id}`)}
                   className="carousel-item"
+                  image={true}
+                  imageSrc="/tournamentBackGround.svg"
                 />
               ))
             ) : (

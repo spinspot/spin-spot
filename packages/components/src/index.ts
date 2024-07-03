@@ -16,4 +16,5 @@ export * from "./paginations";
 export * from "./player-list";
 export * from "./reserves";
 export * from "./service-workers";
+export * from "./stats";
 export * from "./text-inputs";
