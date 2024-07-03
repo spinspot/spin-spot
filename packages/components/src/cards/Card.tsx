@@ -24,7 +24,7 @@ export function Card({
 }: CardProps) {
   return (
     <>
-      <div className={cn("card break-all shadow-xl", className)}>
+      <div className={cn("card max-w-72 break-all shadow-xl", className)}>
         {image && (
           <figure className="h-50">
             <img src={imageSrc} alt="Img" />

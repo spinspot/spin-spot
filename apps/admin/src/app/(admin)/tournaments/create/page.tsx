@@ -1,9 +1,19 @@
-'use client';
+"use client";
 
-import { useState } from "react";
-import { Button, Calendar, TextInput, SelectInput } from "@spin-spot/components";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Button,
+  Calendar,
+  SelectInput,
+  TextInput,
+} from "@spin-spot/components";
+import {
+  TCreateTournamentInputDefinition,
+  createTournamentInputDefinition,
+} from "@spin-spot/models";
+import { useCreateTournament, useToast } from "@spin-spot/services";
 import { useRouter } from "next/navigation";
-import {useCreateTournament, useToast } from "@spin-spot/services";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 const eventTypeOptions = ["1V1", "2V2"];
 const tournamentTypeOptions = ["MEDIUM", "ADVANCED", "BEGINNER"];
@@ -12,141 +22,220 @@ const tournamentFormatOptions = ["LEAGUE", "ELIMINATION"];
 export default function Create() {
   const router = useRouter();
   const { showToast } = useToast();
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [maxTeams, setMaxTeams] = useState<number | undefined>(undefined);
-  const [maxPlayers, setMaxPlayers] = useState<number | undefined>(undefined);
-  const [eventType, setEventType] = useState<string | undefined>(undefined);
-  const [tournamentType, setTournamentType] = useState<string | undefined>(undefined);
-  const [tournamentFormat, setTournamentFormat] = useState<string | undefined>(undefined);
-  const [prize, setPrize] = useState<number>(0);
-  const [tournamentName, setTournamentName] = useState<string>("");
-  const [tournamentDescription, setTournamentDescription] = useState<string>("");
+
   const createTournament = useCreateTournament();
 
-  const handleCreate = () => {
-    if (!eventType || !tournamentType || !tournamentFormat || !startDate || !endDate || (eventType === "2V2" && maxTeams === undefined) || (eventType === "1V1" && maxPlayers === undefined) || prize === undefined || !tournamentName) {
-      showToast({
-        label: "Por favor, llena todos los campos",
-        type: "error"
-      });
-      return;
-    }
-    createTournament.mutate(
-      {
-        name: tournamentName,
-        description: tournamentDescription,
-        prize: prize.toString() + "$",
-        eventType: eventType as "1V1" | "2V2",
-        maxPlayers: maxPlayers,
-        maxTeams: maxTeams,
-        tournamentType: tournamentType as "MEDIUM" | "ADVANCED" | "BEGINNER",
-        tournamentFormat: tournamentFormat as "LEAGUE" | "ELIMINATION",
-        startTime: startDate,
-        endTime: endDate,
-        status: "OPEN",
-        owner: "665229652dc1249bcd4611b7",  // Cambiar esto a user?._id || " " cuando esté listo
-        location: "UNIMET",
-      }, {
-      onSuccess: () => {
-        showToast({
-          label: "Torneo creado exitosamente",
-          type: "success"
-        });
-        router.push("/tournaments");
-      },
-      onError: (error) => {
-        console.log(error);
-        showToast({
-          label: "Error al crear el torneo ", 
-          type: "error"
-        });
-    },
-  },
-    )
+  const handleBackClick = () => {
+    router.push("/tournaments");
   };
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    control,
+  } = useForm<TCreateTournamentInputDefinition>({
+    resolver: zodResolver(createTournamentInputDefinition),
+    shouldFocusError: false,
+    mode: "onBlur",
+  });
+
+  console.log(errors);
+
+  const handleCreateTournament: SubmitHandler<
+    TCreateTournamentInputDefinition
+  > = (data) => {
+    createTournament.mutate(
+      {
+        ...data,
+        prize: data.prize + "$",
+        maxPlayers: watch("eventType") === "1V1" ? data.maxPlayers : undefined,
+        maxTeams: watch("eventType") === "2V2" ? data.maxTeams : undefined,
+        owner: "665229652dc1249bcd4611b7", // Cambiar esto a user?._id || " " cuando esté listo
+        status: "OPEN",
+        location: "UNIMET",
+      },
+      {
+        onSuccess: () => {
+          showToast({
+            label: "Se ha creado el torneo con éxito!",
+            type: "success",
+            duration: 3000,
+          });
+          router.push("/tournaments");
+        },
+        onError: () => {
+          showToast({
+            label: "Ha ocurrido un error al crear el torneo",
+            type: "error",
+            duration: 3000,
+          });
+        },
+      },
+    );
+  };
+
+  const handleFormError = () => {
+    showToast({
+      label: "Por favor, corrige los errores en el formulario",
+      type: "error",
+      duration: 3000,
+    });
+  };
 
   return (
     <div className="font-body flex-grow py-32">
-      <div className="font-title font-bold text-center">
-        <h1 className="flex flex-col text-3xl text-primary">
-          <span>Crear</span>
-          <span>Torneo</span>
+      <div className="font-title text-center font-bold">
+        <h1 className="text-primary dark:text-base-300 flex flex-col text-3xl">
+          <span>Crear Torneo</span>
         </h1>
       </div>
-      <div className="flex flex-col items-center mt-4 gap-y-4 max-w-md mx-auto text-primary ">
+      <div className="text-primary mx-auto mt-4 flex max-w-md flex-col items-center gap-y-4 ">
         <TextInput
           topLeftLabel="Nombre del torneo"
-          placeholder="Nombre del torneo"
-          value={tournamentName || ""}
-          onChange={(e) => setTournamentName(e.target.value)}
+          placeholder="Nombre..."
+          {...register("name")}
+          className={
+            errors.name
+              ? "dark:text-base-300 input-error"
+              : "dark:text-base-300"
+          }
+          bottomLeftLabel={errors.name?.message}
         />
         <TextInput
           topLeftLabel="Descripción del torneo"
-          placeholder="Descripción del torneo"
-          value={tournamentDescription || ""}
-          onChange={(e) => setTournamentDescription(e.target.value)}
+          placeholder="Descripción..."
+          {...register("description")}
+          className={
+            errors.description
+              ? "dark:text-base-300 input-error"
+              : "dark:text-base-300"
+          }
+          bottomLeftLabel={errors.description?.message}
         />
         <TextInput
-          topLeftLabel="Premio"
-          type="number"
-          placeholder="Premio"
-          value={prize}
-          onChange={(e) => setPrize(parseInt(e.target.value))}
+          topLeftLabel="Precio"
+          placeholder="Precio..."
+          {...register("prize")}
+          className={
+            errors.prize
+              ? "dark:text-base-300 input-error"
+              : "dark:text-base-300"
+          }
+          bottomLeftLabel={errors.prize?.message}
         />
         <SelectInput
           topLeftLabel="Tipo de evento"
           defaultOption="Selecciona el tipo de evento"
           options={eventTypeOptions}
-          value={eventType}
-          onChange={(e) => setEventType(e.target.value)}
+          {...register("eventType")}
+          className={
+            errors.eventType
+              ? "dark:text-base-300 select-error"
+              : "dark:text-base-300"
+          }
+          bottomLeftLabel={errors.eventType?.message}
         />
-        <TextInput
-          topLeftLabel={eventType === "1V1" ? "Cantidad de jugadores" : "Cantidad de equipos"}
-          type="number"
-          min={2}
-          max={50}
-          placeholder={eventType === "1V1" ? "Cantidad de jugadores" : "Cantidad de equipos"}
-          value={eventType === "1V1" ? maxPlayers || "" : maxTeams || ""}
-          onChange={(e) => {
-            const value = e.target.value ? parseInt(e.target.value) : undefined;
-            if (eventType === "1V1") {
-              setMaxPlayers(value);
-              setMaxTeams(undefined); 
-            } else {
-              setMaxTeams(value);
-              setMaxPlayers(undefined); 
+        {watch("eventType") === "2V2" && (
+          <TextInput
+            topLeftLabel={"Cantidad de equipos"}
+            placeholder={"Cantidad de equipos..."}
+            {...register("maxTeams", {
+              setValueAs: (value) => parseInt(value, 10),
+            })}
+            className={
+              errors.maxTeams
+                ? "dark:text-base-300 select-error"
+                : "dark:text-base-300"
             }
-          }}
-        />
+            bottomLeftLabel={errors.maxTeams?.message}
+          />
+        )}
+        {watch("eventType") === "1V1" && (
+          <TextInput
+            topLeftLabel={"Cantidad de jugadores"}
+            placeholder={"Cantidad de jugadores..."}
+            {...register("maxPlayers", {
+              setValueAs: (value) => parseInt(value, 10),
+            })}
+            className={
+              errors.maxPlayers
+                ? "dark:text-base-300 select-error"
+                : "dark:text-base-300"
+            }
+            bottomLeftLabel={errors.maxPlayers?.message}
+          />
+        )}
         <SelectInput
           topLeftLabel="Tipo de torneo"
           defaultOption="Selecciona el tipo de torneo"
           options={tournamentTypeOptions}
-          value={tournamentType}
-          onChange={(e) => setTournamentType(e.target.value)}
+          {...register("tournamentType")}
+          className={
+            errors.tournamentType
+              ? "dark:text-base-300 select-error"
+              : "dark:text-base-300"
+          }
+          bottomLeftLabel={errors.tournamentType?.message}
         />
         <SelectInput
           topLeftLabel="Formato del torneo"
           defaultOption="Selecciona el formato del torneo"
           options={tournamentFormatOptions}
-          value={tournamentFormat}
-          onChange={(e) => setTournamentFormat(e.target.value)}
+          {...register("tournamentFormat")}
+          className={
+            errors.tournamentFormat
+              ? "dark:text-base-300 select-error"
+              : "dark:text-base-300"
+          }
+          bottomLeftLabel={errors.tournamentFormat?.message}
         />
-        <div className="flex flex-col items-center mt-2">
-          <span className="label-text text-2xl">Fecha de inicio</span>
-          <Calendar onDateChange={setStartDate} endDate={endDate} />
+
+        <div className="mt-10 flex flex-col items-center">
+          <span className="label-text text-primary dark:text-base-300 text-2xl font-bold">
+            Fecha de inicio
+          </span>
+          <Controller
+            control={control}
+            name="startTime"
+            render={({ field }) => (
+              <Calendar
+                onDateChange={(date) => field.onChange(date)}
+                endDate={watch("endTime")}
+              />
+            )}
+          />
         </div>
-        <div className="flex flex-col items-center mt-2">
-          <span className="label-text text-2xl">Fecha de finalización</span>
-          <Calendar onDateChange={setEndDate} />
+        <div className="mt-5 flex flex-col items-center">
+          <span className="label-text text-primary dark:text-base-300 text-2xl font-bold">
+            Fecha de finalización
+          </span>
+          <Controller
+            control={control}
+            name="endTime"
+            render={({ field }) => (
+              <Calendar
+                onDateChange={(date) => field.onChange(date)}
+                startDate={watch("startTime")}
+              />
+            )}
+          />
         </div>
-        <Button onClick={handleCreate} label="Crear Torneo"></Button>
+        <div className={"mt-4 flex w-full flex-col gap-3"}>
+          <Button
+            onClick={handleSubmit(handleCreateTournament, handleFormError)}
+            label="Crear Torneo"
+            className="btn-primary"
+          ></Button>
+          <Button
+            className="btn-md btn-link text-secondary mx-auto !no-underline"
+            label="Volver"
+            labelSize="text-md"
+            onClick={handleBackClick}
+          />
+        </div>
       </div>
     </div>
   );
 }
-
-
-

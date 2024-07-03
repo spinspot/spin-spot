@@ -1,22 +1,29 @@
 "use client";
 
 import { Button, Card, Loader } from "@spin-spot/components";
+import { useNotClosedTournaments } from "@spin-spot/services";
 import { useRouter } from "next/navigation";
-import { useNotClosedTournaments} from "@spin-spot/services";
 
 export default function Tournaments() {
   const router = useRouter();
   const { data: tournaments, isLoading } = useNotClosedTournaments();
 
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader variant="dots" size="lg" className="text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex-grow">
-      <div className="font-title font-bold text-center">
+      <div className="font-title mt-3 text-center font-bold">
         <h1 className="flex flex-col text-3xl">
-          <span>Torneos</span>
-          <span>UNIMET</span>
+          <span>Torneos SpinSpot</span>
         </h1>
       </div>
-      <div className="flex justify-center items-center mt-4 gap-4">
+      <div className="mt-4 flex items-center justify-center gap-4">
         <Button
           className="btn-primary"
           label="Crear Nuevo Torneo"
@@ -26,24 +33,23 @@ export default function Tournaments() {
           Torneos Activos: {tournaments ? tournaments.length : 0}
         </div>
       </div>
-      <div className="mt-6 flex justify-center">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {isLoading ? (
-            <Loader />
-          ) : (
-            tournaments?.map((tournament) => (
-              <Card
-                labelName={tournament.name}
-                label={tournament.description}
-                labelButton="Ver/Editar Torneo"
-                image={false}
-                onClick={() => router.push(`/tournaments/edit-tournament/${tournament._id}`)}
-              />
-            ))
-          )}
+      <div className="my-6 flex justify-center p-5">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {tournaments?.map((tournament, index) => (
+            <Card
+              key={index}
+              labelName={tournament.name}
+              label={tournament.description}
+              labelButton="Editar Torneo"
+              onClick={() =>
+                router.push(`/tournaments/edit-tournament/${tournament._id}`)
+              }
+              image={true}
+              imageSrc="/tournamentBackGround.svg"
+            />
+          ))}
         </div>
       </div>
     </div>
   );
 }
-

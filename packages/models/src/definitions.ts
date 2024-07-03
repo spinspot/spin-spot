@@ -30,7 +30,9 @@ export type TDayOfWeek = z.infer<typeof dayOfWeekDefinition>;
 export const userTypeDefinition = z.enum(["PLAYER", "ADMIN"]);
 export type TUserTypeEnum = z.infer<typeof userTypeDefinition>;
 
-export const eventTypeDefinition = z.enum(["1V1", "2V2"]);
+export const eventTypeDefinition = z.enum(["1V1", "2V2"], {
+  message: "Se debe seleccionar una de las siguientes opciones: 1V1 | 2V2",
+});
 export type TEventTypeEnum = z.infer<typeof eventTypeDefinition>;
 export const statusTypeDefinition = z.enum([
   "PENDING",
@@ -46,26 +48,31 @@ export const timeBlockStatusDefinition = z.enum([
 ]);
 export type TStatusTimeTypeEnum = z.infer<typeof timeBlockStatusDefinition>;
 
-export const tournamentLevelTypeDefinition = z.enum([
-  "MEDIUM",
-  "ADVANCED",
-  "BEGINNER",
-]);
+export const tournamentLevelTypeDefinition = z.enum(
+  ["MEDIUM", "ADVANCED", "BEGINNER"],
+  {
+    message:
+      "Se debe seleccionar una de las siguientes opciones: MEDIUM | ADVANCED | BEGINNER",
+  },
+);
 export type TTournamentLevelTypeEnum = z.infer<
   typeof tournamentLevelTypeDefinition
 >;
 
-export const tournamentFormatTypeDefinition = z.enum(["LEAGUE", "ELIMINATION"]);
+export const tournamentFormatTypeDefinition = z.enum(
+  ["LEAGUE", "ELIMINATION"],
+  {
+    message:
+      "Se debe seleccionar una de las siguientes opciones: LEAGUE | ELIMINATION",
+  },
+);
 export type TTournamentFormatTypeEnum = z.infer<
   typeof tournamentFormatTypeDefinition
 >;
 
-export const statusTournamentTypeDefinition = z.enum([
-  "OPEN",
-  "CLOSED",
-  "IN_PROGRESS",
-  "FINISHED",
-]);
+export const statusTournamentTypeDefinition = z
+  .enum(["OPEN", "CLOSED", "IN_PROGRESS", "FINISHED"])
+  .optional();
 export type TStatusTournamentTypeEnum = z.infer<
   typeof statusTournamentTypeDefinition
 >;
