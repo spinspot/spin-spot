@@ -47,8 +47,8 @@ async function updateUser(req: Request, res: Response) {
 }
 
 async function getAvailableUsers(req: Request, res: Response) {
-    const users = await userService.getAvailableUsers();
-    return res.status(200).json(users);
+  const users = await userService.getAvailableUsers();
+  return res.status(200).json(users);
 }
 
 async function getAvailableUsersByTournament(req: Request, res: Response) {
@@ -56,7 +56,6 @@ async function getAvailableUsersByTournament(req: Request, res: Response) {
   const users = await userService.getAvailableUsersByTournament(params._id);
   return res.status(200).json(users);
 }
-
 
 export const userController = {
   getUsers,

@@ -1,6 +1,7 @@
 import { Pagination } from "../paginations";
 
 interface SelectionSectionProps {
+  isAdmin: string | null;
   options: string[];
   optinosNo: string[];
   eventType: string | null;
@@ -13,6 +14,7 @@ interface SelectionSectionProps {
 }
 
 export function SelectionSection({
+  isAdmin,
   options,
   optinosNo,
   setEventType,
@@ -31,7 +33,15 @@ export function SelectionSection({
           size="sm"
           onPageChange={(label) => {
             setEventType(label ?? null);
-            resetInputs(label === "1V1" ? 1 : 3);
+            resetInputs(
+              isAdmin !== null
+                ? label === "1V1"
+                  ? 2
+                  : 4
+                : label === "1V1"
+                  ? 1
+                  : 3,
+            );
           }}
           className="btn-neutral mt-2 min-w-28 text-nowrap"
         />

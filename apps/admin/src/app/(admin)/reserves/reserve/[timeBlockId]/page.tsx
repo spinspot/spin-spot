@@ -39,11 +39,15 @@ export default function Reserve({ params }: { params: ReserveParams }) {
   const optinosNo = ["NO", "SI"];
   const optionsInv = ["NO", "SI"];
   const [invitations, setInvitations] = useState<string | null>(null);
-  const [searchTexts, setSearchTexts] = useState<string[]>([]);
+  const [searchTexts, setSearchTexts] = useState<string[]>(Array(1).fill(null));
   const [suggestions, setSuggestions] = useState<any[][]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<(string | null)[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<(string | any)[]>(
+    Array(1).fill(""),
+  );
+  const [selectedOwner, setSelectedOwner] = useState<string | any>();
   const [eventType, setEventType] = useState<string | null>(null);
   const [indumentary, setIndumentary] = useState<string | null>(null);
+  const [adminState, setAdmin] = useState<string | null>(null);
   const [invitedUsers, setInvitedUsers] = useState<IInvitedUser[]>([]);
   const router = useRouter();
 
@@ -52,6 +56,7 @@ export default function Reserve({ params }: { params: ReserveParams }) {
   };
 
   const timeBlock = useTimeBlock(params.timeBlockId);
+
   const table = useTable(timeBlock.data?.table._id);
   const users = useUsers();
   const createBooking = useCreateBooking();
@@ -108,6 +113,11 @@ export default function Reserve({ params }: { params: ReserveParams }) {
     setSelectedUsers(Array(length).fill(null));
   };
 
+  const handleOwner = () => {
+    setSelectedOwner(selectedUsers[0]);
+    setAdmin("Aprobado");
+  };
+
   const handleReserve = async () => {
     if (!eventType || !indumentary || !user || !timeBlock.isSuccess) return;
 
@@ -129,7 +139,7 @@ export default function Reserve({ params }: { params: ReserveParams }) {
       createBooking.mutate(
         {
           eventType: eventType as "1V1" | "2V2",
-          owner: user._id,
+          owner: selectedOwner,
           table: timeBlock.data?.table._id,
           players: validPlayers,
           timeBlock: params.timeBlockId,
@@ -185,6 +195,7 @@ export default function Reserve({ params }: { params: ReserveParams }) {
       });
     } else {
       finalizeReserve();
+      console.log(validPlayers);
     }
   };
 
@@ -214,90 +225,129 @@ export default function Reserve({ params }: { params: ReserveParams }) {
   }
 
   return (
-    <div className="font-body flex-grow py-32">
-      {timeBlock.isSuccess && (
-        <ReservationInfo
-          dateReserve={new Date(timeBlock.data.startTime)
-            .toLocaleDateString([], {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-            })
-            .replace(/\//g, "-")}
-          startTime={new Date(timeBlock.data.startTime).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-          endTime={new Date(timeBlock.data.endTime).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-          tableCode={timeBlock.data.table.code}
-          user={user}
-        />
-      )}
-      <SelectionSection
-        isAdmin={null}
-        options={options}
-        optinosNo={optinosNo}
-        eventType={eventType}
-        indumentary={indumentary}
-        setEventType={setEventType}
-        setIndumentary={setIndumentary}
-        resetInputs={resetInputs}
-      />
-      <div className="flex w-full flex-col items-center justify-center max-sm:p-6 sm:mt-4">
-        {eventType && (
-          <>
-            <h3 className="text-center text-lg">
-              ¿Deseas invitar un amigo a la reserva?
-            </h3>
-            <Pagination
-              labels={optionsInv}
-              initialActiveIndex={null}
-              size="sm"
-              onPageChange={(label) => setInvitations(label ?? null)}
-              className="btn-neutral mt-2 min-w-28 text-nowrap"
+    <div className="font-body flex-grow px-64 py-32">
+      {adminState === null ? (
+        <div className="flex w-full flex-col items-center justify-center max-sm:p-6 sm:mt-4">
+          <h2 className=" text-center text-3xl">
+            Ingrese el dueño de la reserva
+          </h2>
+          <PlayerInput
+            searchTexts={searchTexts}
+            suggestions={suggestions}
+            selectedUsers={selectedUsers}
+            handleSearch={handleSearch}
+            handleSelectUser={handleSelectUser}
+          />
+          <div className="mt-4 flex w-full flex-col justify-center gap-2 px-5 max-sm:px-6 sm:mt-6">
+            <Button
+              label="Escoger"
+              labelSize="text-sm"
+              className={
+                selectedUsers[0] !== "" && selectedUsers[0] !== null
+                  ? "btn-md btn-primary"
+                  : "btn-primary btn-md btn-disabled"
+              }
+              onClick={handleOwner}
+              isLoadinglabel="Reservando..."
             />
-            {invitations === "SI" ? (
-              <InvitationSection
-                timeBlockId={params.timeBlockId}
-                onSubmit={onInviteUser}
-              />
-            ) : (
-              <PlayerInput
-                searchTexts={searchTexts}
-                suggestions={suggestions}
-                selectedUsers={selectedUsers}
-                handleSearch={handleSearch}
-                handleSelectUser={handleSelectUser}
+            <Button
+              label="Cancelar"
+              labelSize="text-sm"
+              className="btn-md btn-link text-secondary mx-auto !no-underline"
+              onClick={() => router.back()}
+            />
+          </div>
+        </div>
+      ) : (
+        <>
+          {timeBlock.isSuccess && (
+            <ReservationInfo
+              dateReserve={new Date(timeBlock.data.startTime)
+                .toLocaleDateString([], {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                })
+                .replace(/\//g, "-")}
+              startTime={new Date(timeBlock.data.startTime).toLocaleTimeString(
+                [],
+                {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                },
+              )}
+              endTime={new Date(timeBlock.data.endTime).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              tableCode={timeBlock.data.table.code}
+              user={user}
+            />
+          )}
+          <SelectionSection
+            isAdmin={null}
+            options={options}
+            optinosNo={optinosNo}
+            eventType={eventType}
+            indumentary={indumentary}
+            setEventType={setEventType}
+            setIndumentary={setIndumentary}
+            resetInputs={resetInputs}
+          />
+          <div className="mx-4 flex w-full flex-col items-center justify-center max-sm:p-6 sm:mt-4">
+            {eventType && (
+              <>
+                <h3 className="text-center text-lg">
+                  ¿Deseas invitar un amigo a la reserva?
+                </h3>
+                <Pagination
+                  labels={optionsInv}
+                  initialActiveIndex={null}
+                  size="sm"
+                  onPageChange={(label) => setInvitations(label ?? null)}
+                  className="btn-neutral mt-2 min-w-28 text-nowrap"
+                />
+                {invitations === "SI" ? (
+                  <InvitationSection
+                    timeBlockId={params.timeBlockId}
+                    onSubmit={onInviteUser}
+                  />
+                ) : (
+                  <PlayerInput
+                    searchTexts={searchTexts}
+                    suggestions={suggestions}
+                    selectedUsers={selectedUsers}
+                    handleSearch={handleSearch}
+                    handleSelectUser={handleSelectUser}
+                  />
+                )}
+              </>
+            )}
+          </div>
+          <div className="flex flex-col justify-center gap-2 max-sm:px-6 sm:mt-6">
+            <Button
+              label="Reservar"
+              labelSize="text-sm"
+              className={
+                eventType != null && indumentary != null
+                  ? "btn-md btn-primary"
+                  : "btn-primary btn-md btn-disabled"
+              }
+              onClick={handleReserve}
+              isLoading={!createBooking.isIdle}
+              isLoadinglabel="Reservando..."
+            />
+            {createBooking.isIdle && (
+              <Button
+                label="Cancelar"
+                labelSize="text-sm"
+                className="btn-md btn-link text-secondary mx-auto !no-underline"
+                onClick={() => router.back()}
               />
             )}
-          </>
-        )}
-      </div>
-      <div className="flex w-full flex-col justify-center gap-2 max-sm:px-6 sm:mt-6">
-        <Button
-          label="Reservar"
-          labelSize="text-sm"
-          className={
-            eventType != null && indumentary != null
-              ? "btn-md btn-primary"
-              : "btn-primary btn-md btn-disabled"
-          }
-          onClick={handleReserve}
-          isLoading={!createBooking.isIdle}
-          isLoadinglabel="Reservando..."
-        />
-        {createBooking.isIdle && (
-          <Button
-            label="Cancelar"
-            labelSize="text-sm"
-            className="btn-md btn-link text-secondary mx-auto !no-underline"
-            onClick={() => router.back()}
-          />
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -75,7 +75,7 @@ export async function cancelBooking({
 
 export function useCancelBooking() {
   const queryClient = useQueryClient();
- 
+
   return useMutation({
     mutationKey: ["cancelBooking"],
     mutationFn: cancelBooking,

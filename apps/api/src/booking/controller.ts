@@ -236,30 +236,41 @@ async function joinBooking(req: Request, res: Response) {
   const params = updateBookingParamsDefinition.parse(req.params);
 
   const booking = await bookingService.getBooking(params._id);
-  if(user &&
-    booking && 
-    booking.eventType ==="1V1" &&
+  if (
+    user &&
+    booking &&
+    booking.eventType === "1V1" &&
     booking.players &&
-    booking.players.length <2 &&
-    !booking.players.some((player) => player._id.toString() === user._id.toString())
-  ){
-    const updatedPlayers = [...booking.players.map((player) => player._id), user._id];
+    booking.players.length < 2 &&
+    !booking.players.some(
+      (player) => player._id.toString() === user._id.toString(),
+    )
+  ) {
+    const updatedPlayers = [
+      ...booking.players.map((player) => player._id),
+      user._id,
+    ];
     bookingService.updateBooking(booking._id, {
       players: updatedPlayers,
-    })
+    });
     return res.status(200).json(booking);
   } else if (
     user &&
     booking &&
-    booking.eventType ==="2V2" &&
+    booking.eventType === "2V2" &&
     booking.players &&
-    booking.players.length <4 &&
-    !booking.players.some((player) => player._id.toString() === user._id.toString())
-  ){
-      const updatedPlayers = [...booking.players.map((player) => player._id), user._id];
-      bookingService.updateBooking(booking._id, {
+    booking.players.length < 4 &&
+    !booking.players.some(
+      (player) => player._id.toString() === user._id.toString(),
+    )
+  ) {
+    const updatedPlayers = [
+      ...booking.players.map((player) => player._id),
+      user._id,
+    ];
+    bookingService.updateBooking(booking._id, {
       players: updatedPlayers,
-    })
+    });
     return res.status(200).json(booking);
   } else {
     throw new ApiError({
@@ -279,11 +290,10 @@ async function leaveBooking(req: Request, res: Response) {
   const params = updateBookingParamsDefinition.parse(req.params);
 
   const booking = await bookingService.getBooking(params._id);
-  if(user &&
-    booking && 
-    booking.players
-  ){
-    const playerIndex = booking.players.findIndex((player) => player._id.toString() === user._id.toString());
+  if (user && booking && booking.players) {
+    const playerIndex = booking.players.findIndex(
+      (player) => player._id.toString() === user._id.toString(),
+    );
     if (playerIndex !== -1) {
       booking.players.splice(playerIndex, 1);
       await bookingService.updateBooking(params._id, {
@@ -294,8 +304,7 @@ async function leaveBooking(req: Request, res: Response) {
         status: 400,
         errors: [
           {
-            message:
-              "El usuario no está en la reserva",
+            message: "El usuario no está en la reserva",
           },
         ],
       });
@@ -305,8 +314,7 @@ async function leaveBooking(req: Request, res: Response) {
       status: 400,
       errors: [
         {
-          message:
-            "Error al salir de la reserva",
+          message: "Error al salir de la reserva",
         },
       ],
     });
@@ -341,7 +349,7 @@ async function cancelBooking(req: Request, res: Response) {
 
 async function getBookingsByPlayer(req: Request, res: Response) {
   const { playerId } = req.params;
-  const validPlayerId = playerId ?? ""; 
+  const validPlayerId = playerId ?? "";
   const bookings = await bookingService.getBookingsByPlayer(validPlayerId);
   return res.status(200).json(bookings);
 }

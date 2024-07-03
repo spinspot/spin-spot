@@ -30,7 +30,7 @@ export function Header({ isAdmin = false }: HeaderProps) {
   };
 
   const handleReservesClick = () => {
-    router.push("/resrves");
+    router.push("/reserves");
   };
 
   const handleHomeClick = () => {

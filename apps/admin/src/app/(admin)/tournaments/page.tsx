@@ -1,8 +1,8 @@
 "use client";
 
 import { Button, Card, Loader } from "@spin-spot/components";
-import { useRouter } from "next/navigation";
 import { useTournaments } from "@spin-spot/services";
+import { useRouter } from "next/navigation";
 
 export default function Tournaments() {
   const router = useRouter();
@@ -10,13 +10,13 @@ export default function Tournaments() {
 
   return (
     <div className="flex-grow">
-      <div className="font-title font-bold text-center">
+      <div className="font-title text-center font-bold">
         <h1 className="flex flex-col text-3xl">
           <span>Torneos</span>
           <span>UNIMET</span>
         </h1>
       </div>
-      <div className="flex justify-center items-center mt-4 gap-4">
+      <div className="mt-4 flex items-center justify-center gap-4">
         <Button
           className="btn-primary"
           label="Crear Nuevo Torneo"
@@ -27,7 +27,7 @@ export default function Tournaments() {
         </div>
       </div>
       <div className="mt-6 flex justify-center">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {isLoading ? (
             <Loader />
           ) : (
@@ -37,7 +37,9 @@ export default function Tournaments() {
                 label={tournament.description}
                 labelButton="Ver/Editar Torneo"
                 image={false}
-                onClick={() => router.push(`/tournaments/edit-tournament/${tournament._id}`)}
+                onClick={() =>
+                  router.push(`/tournaments/edit-tournament/${tournament._id}`)
+                }
               />
             ))
           )}
@@ -46,4 +48,3 @@ export default function Tournaments() {
     </div>
   );
 }
-
