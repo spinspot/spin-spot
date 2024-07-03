@@ -113,6 +113,8 @@ export default function Register() {
           label="Registrarse"
           labelSize="text-md"
           onClick={handleSubmit(handleSignUp)}
+          isLoading={!signUpWithCredentials.isIdle}
+          isLoadinglabel="Registrandose..."
         />
         <div className="flex justify-center">
           <Button

@@ -4,6 +4,11 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { DayPicker } from "react-day-picker";
 
+const today = new Date();
+const fromMonth = new Date(today.getFullYear(), today.getMonth());
+const startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 6);
+
 interface CalendarProps {
   onDateChange: (_date: Date | undefined) => void;
 }
@@ -19,10 +24,7 @@ export function Calendar({ onDateChange }: CalendarProps) {
   };
 
   const disablePastDates = (date: Date): boolean => {
-    const today = new Date();
-    return (
-      date < new Date(today.getFullYear(), today.getMonth(), today.getDate())
-    );
+    return date < startDate || date > endDate;
   };
 
   return (
@@ -34,6 +36,7 @@ export function Calendar({ onDateChange }: CalendarProps) {
           selected={date}
           showOutsideDays
           disabled={disablePastDates} // Deshabilitar fechas pasadas
+          fromMonth={fromMonth}
           classNames={{
             caption: "flex justify-center py-2 m-4 relative items-center",
             caption_label: "text-lg font-bold",
@@ -67,3 +70,4 @@ export function Calendar({ onDateChange }: CalendarProps) {
     </div>
   );
 }
+

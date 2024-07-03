@@ -38,7 +38,7 @@ export function Pagination({
   }, [initialActiveIndex]);
 
   const handleClick = (index: number) => {
-    const newIndex = index === currentIndex ? null : index;
+    const newIndex = index;
     setCurrentIndex(newIndex);
     if (onPageChange) {
       onPageChange(newIndex !== null ? labels[newIndex] : null);

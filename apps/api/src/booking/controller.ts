@@ -1,7 +1,7 @@
 import { sendMail } from "@/email";
 import { tableService } from "@/table";
-import { userService } from "@/user";
 import { timeBlockService } from "@/time-block";
+import { userService } from "@/user";
 import {
   ApiError,
   IPopulatedBooking,
@@ -63,12 +63,12 @@ async function bookingWithUser(req: Request, res: Response) {
       errors: [{ message: "Hay jugadores repetidos en la reserva" }],
     });
   }
- if (!(await userService.isUserAvailable(user?._id.toString() ?? ""))) {
-   throw new ApiError({
-     status: 400,
-     errors: [{ message: "Ya tienes una Reserva Activa" }],
-   });
- }
+  if (!(await userService.isUserAvailable(user?._id.toString() ?? ""))) {
+    throw new ApiError({
+      status: 400,
+      errors: [{ message: "Ya tienes una Reserva Activa" }],
+    });
+  }
 
   const session = await startSession();
 
@@ -112,7 +112,7 @@ async function updateBooking(req: Request, res: Response) {
 
   //Obtenemos los jugadores de la reserva actual, esto para no revisar si están disponibles
   const currentPlayers = prevBooking.players.map((player: { _id: string }) =>
-    player._id.toString()
+    player._id.toString(),
   );
 
   const unavailablePlayers = [];
@@ -128,9 +128,7 @@ async function updateBooking(req: Request, res: Response) {
   if (unavailablePlayers.length > 0) {
     throw new ApiError({
       status: 400,
-      errors: [
-        { message: "Hay jugadores que ya están en una reserva activa" },
-      ],
+      errors: [{ message: "Hay jugadores que ya están en una reserva activa" }],
     });
   }
 
@@ -142,8 +140,6 @@ async function updateBooking(req: Request, res: Response) {
   const newBooking: IPopulatedBooking | any = await bookingService.getBooking(
     params._id,
   );
-
-
 
   let actionMessage = "";
 
@@ -184,6 +180,8 @@ async function updateBooking(req: Request, res: Response) {
         )
         .join(", ");
       actionMessage = `Hola! ${booking.owner.firstName} ${booking.owner.lastName}, este correo informativo es para notificarle que los siguientes jugadores se han salido de su reserva: <br> ${leftPlayerNames}`;
+    } else if (leftPlayers.length === 0 && joinedPlayers.length === 0) {
+      actionMessage = `Hola! ${booking.owner.firstName} ${booking.owner.lastName}, este correo informativo es para notificarle que su reserva ha sido editada recientemente. A continuación puede presionar el botón para visualizar los cambios`;
     }
   }
 

@@ -91,6 +91,8 @@ export default function Login() {
           label="Iniciar Sesión"
           labelSize="text-md"
           onClick={handleSubmit(handleSignIn)}
+          isLoading={!signInWithCredentials.isIdle}
+          isLoadinglabel="Iniciando Sesión..."
         />
         <Button
           className="btn-sm btn-neutral w-full"
@@ -115,7 +117,7 @@ export default function Login() {
       </div>
       <div className="flex flex-col gap-1">
         <Button
-          className="btn-sm btn-link text-secondary dark:text-base-300 space-y-0 !no-underline"
+          className="btn-sm btn-link text-secondary dark:text-neutral space-y-0 !no-underline"
           label="Olvidaste tu contraseña?"
           labelSize="text-md"
           onClick={handleForgotPasswordClick}

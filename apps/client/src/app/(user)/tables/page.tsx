@@ -12,6 +12,7 @@ import {
   useUpdateBooking,
   useUpdateTimeBlock,
 } from "@spin-spot/services";
+import { cn } from "@spin-spot/utils";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
@@ -32,8 +33,8 @@ export default function Tables() {
   const availableUsers = useAvailableUsers();
   const { showToast } = useToast();
   const updateBooking = useUpdateBooking();
-  const { mutate: updateTimeBlock } = useUpdateTimeBlock();
-  const { mutate: cancelBooking } = useCancelBooking();
+  const updateTimeBlock = useUpdateTimeBlock();
+  const cancelBooking = useCancelBooking();
 
   const [loadingBlockId, setLoadingBlockId] = useState<string | null>(null);
 
@@ -62,10 +63,11 @@ export default function Tables() {
     timeBlockId: string,
     bookingId: string,
   ) => {
-    try {
-      cancelBooking(bookingId, {
+    cancelBooking.mutate(
+      { _id: bookingId },
+      {
         onSuccess: () => {
-          updateTimeBlock({
+          updateTimeBlock.mutate({
             _id: timeBlockId,
             status: "AVAILABLE",
             booking: null,
@@ -82,19 +84,14 @@ export default function Tables() {
             type: "error",
           });
         },
-      });
-    } catch (error) {
-      console.error("Error al cancelar la reserva:", error);
-      showToast({
-        label: "Error al cancelar la reserva",
-        type: "error",
-      });
-    }
+      },
+    );
   };
 
   useEffect(() => {
     if (tables?.length) {
-      setSelectedTable(null); // No seleccionar ninguna mesa por defecto
+      //seleccionar primera mesa por defecto
+      setSelectedTable(tables?.[0]?.code ?? null);
     }
   }, [tables]);
 
@@ -221,18 +218,23 @@ export default function Tables() {
 
   const filteredTimeBlocks = useMemo<IPopulatedTimeBlock[]>(() => {
     if (!selectedDate || !timeBlocks.data) return [];
-    return timeBlocks.data.filter((block) => {
-      const blockDate = new Date(block.startTime);
-      // Filtrar por fecha y, si hay una mesa seleccionada, por el código de mesa
-      const isSameDate =
-        blockDate.getDate() === selectedDate.getDate() &&
-        blockDate.getMonth() === selectedDate.getMonth() &&
-        blockDate.getFullYear() === selectedDate.getFullYear();
-      const isSameTable = selectedTable
-        ? block.table.code === selectedTable
-        : true;
-      return isSameDate && isSameTable;
-    });
+    return timeBlocks.data
+      .filter((block) => {
+        const blockDate = new Date(block.startTime);
+        // Filtrar por fecha y, si hay una mesa seleccionada, por el código de mesa
+        const isSameDate =
+          blockDate.getDate() === selectedDate.getDate() &&
+          blockDate.getMonth() === selectedDate.getMonth() &&
+          blockDate.getFullYear() === selectedDate.getFullYear();
+        const isSameTable = selectedTable
+          ? block.table.code === selectedTable
+          : true;
+        return isSameDate && isSameTable;
+      })
+      .sort(
+        (a, b) =>
+          new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
+      );
   }, [timeBlocks, selectedDate, selectedTable]);
 
   return (
@@ -245,7 +247,8 @@ export default function Tables() {
       <Pagination
         className="btn-neutral"
         labels={tables?.map((table) => table.code) || []}
-        onPageChange={(label) => setSelectedTable(label ?? null)} // Si no hay mesa seleccionada, se pone null
+        onPageChange={(label) => setSelectedTable(label ?? null)}
+        initialActiveIndex={tables ? 0 : null}
       />
       <div className="mt-2 w-full overflow-x-auto p-4 sm:w-4/5">
         {timeBlocks.isLoading ? (
@@ -256,13 +259,16 @@ export default function Tables() {
               variant="dots"
             />{" "}
           </div>
+        ) : filteredTimeBlocks.length === 0 ? (
+          <div className="flex items-center justify-center text-center text-lg font-bold">
+            Lo Sentimos, no hay horarios disponibles para esta fecha.
+          </div>
         ) : (
           <table className="table-lg table w-full items-center justify-center text-center">
             <thead>
               <tr>
-                <th className="w-[125px]">Horarios</th>
-                <th>Estado</th>
-                <th className="w-[125px]">Mesa</th>
+                <th className="w-4">Horarios</th>
+                <th className="w-4">Estado</th>
               </tr>
             </thead>
             <tbody>
@@ -290,91 +296,114 @@ export default function Tables() {
                       })}
                     </td>
                     <td>
-                      {blockDate.isBefore(now) &&
-                      block.status.toLowerCase() === "available" ? (
+                      {blockDate.isBefore(now) ? (
                         <span>El horario ya ha pasado</span>
                       ) : (
-                        block.status.toLowerCase() === "available" && (
-                          <Button
-                            className="btn-primary btn-sm"
-                            label="Reservar"
-                            labelSize="text-md"
-                            onClick={() => handleReserve(`${block._id}`)}
-                          />
-                        )
-                      )}
-                      {block.status.toLowerCase() === "booked" &&
-                        user?._id === block.booking?.owner && (
-                          <div className="flex flex-col items-center justify-center gap-2">
+                        <>
+                          {block.status.toLowerCase() === "available" && (
                             <Button
-                              className="btn-primary btn-sm mx-2 w-20"
-                              label="Editar"
+                              className="btn-primary btn-sm"
+                              label="Reservar"
                               labelSize="text-md"
-                              onClick={() => handleEdit(`${block._id}`)}
+                              onClick={() => handleReserve(`${block._id}`)}
+                              isLoading={timeBlocks.isFetching}
+                              isLoadinglabel="Actualizando..."
                             />
-                            <Button
-                              className="btn-link text-secondary btn-sm mx-auto !no-underline"
-                              label="Eiminar"
-                              labelSize="text-md"
-                              onClick={() =>
-                                handleShowCancelationToast(
-                                  block._id.toString(),
-                                  block.booking?._id.toString(),
-                                )
-                              }
-                            />
-                          </div>
-                        )}
-                      {block.status === "BOOKED" &&
-                        user?._id !== block.booking?.owner && (
-                          <>
-                            {isUserJoined ? (
-                              <>
+                          )}
+                          {block.status.toLowerCase() === "booked" &&
+                            user?._id === block.booking?.owner && (
+                              <div className="flex flex-col items-center justify-center gap-2">
                                 <Button
-                                  className={`btn-secondary btn-sm mx-2 ${loadingBlockId ? "btn-disabled" : ""}`}
-                                  label={
-                                    loadingBlockId === block._id ? (
-                                      <div className="flex items-center justify-center gap-2">
-                                        <Loader size="sm" /> Saliéndose...
-                                      </div>
-                                    ) : (
-                                      "Salirse"
-                                    )
-                                  }
+                                  className={cn(
+                                    "btn-secondary btn-sm mx-2 w-20",
+                                    !cancelBooking.isIdle && "btn-disabled",
+                                  )}
+                                  label="Editar"
                                   labelSize="text-md"
-                                  onClick={() =>
-                                    handleShowSalirseToast(block.booking)
-                                  }
+                                  onClick={() => handleEdit(`${block._id}`)}
                                 />
-                                <span>{`${playersCount}/${maxPlayers}`}</span>
-                              </>
-                            ) : playersCount < maxPlayers ? (
-                              <>
-                                <Button
-                                  className={`btn-primary btn-sm mx-2 ${loadingBlockId ? "btn-disabled" : ""}`}
-                                  label={
-                                    loadingBlockId === block._id ? (
-                                      <div className="flex items-center justify-center gap-2">
-                                        <Loader size="sm" /> Uniéndose...
-                                      </div>
-                                    ) : (
-                                      "Unirse"
-                                    )
-                                  }
-                                  labelSize="text-md"
-                                  onClick={() =>
-                                    handleShowJoinToast(block.booking)
-                                  }
-                                />
-                                <span>{`${playersCount}/${maxPlayers}`}</span>
-                              </>
-                            ) : (
-                              <span>Reservado</span>
+                                {!cancelBooking.isIdle ? (
+                                  <div className="mt-2 flex items-center justify-center">
+                                    <Loader
+                                      className="text-secondary"
+                                      size="md"
+                                      variant="dots"
+                                    />
+                                  </div>
+                                ) : (
+                                  <Button
+                                    className="btn-link text-secondary btn-sm !no-underline"
+                                    label="Eiminar"
+                                    labelSize="text-md"
+                                    onClick={() =>
+                                      handleShowCancelationToast(
+                                        block._id.toString(),
+                                        block.booking?._id.toString(),
+                                      )
+                                    }
+                                  />
+                                )}
+                              </div>
                             )}
-                          </>
-                        )}
+                          {block.status === "BOOKED" &&
+                            user?._id !== block.booking?.owner && (
+                              <>
+                                {isUserJoined ? (
+                                  <>
+                                    <Button
+                                      className={`btn-secondary btn-sm mx-2 ${loadingBlockId ? "btn-disabled" : ""}`}
+                                      label={
+                                        loadingBlockId === block._id ? (
+                                          <div className="flex items-center justify-center gap-2">
+                                            <Loader size="sm" /> Saliéndose...
+                                          </div>
+                                        ) : (
+                                          "Salirse"
+                                        )
+                                      }
+                                      labelSize="text-md"
+                                      onClick={() =>
+                                        handleShowSalirseToast(block.booking)
+                                      }
+                                      isLoading={timeBlocks.isFetching}
+                                      isLoadinglabel="Actualizando..."
+                                    />
+                                    {!timeBlocks.isFetching && (
+                                      <span>{`${playersCount}/${maxPlayers}`}</span>
+                                    )}
+                                  </>
+                                ) : playersCount < maxPlayers ? (
+                                  <>
+                                    <Button
+                                      className={`btn-primary btn-sm mx-2 ${loadingBlockId ? "btn-disabled" : ""}`}
+                                      label={
+                                        loadingBlockId === block._id ? (
+                                          <div className="flex items-center justify-center gap-2">
+                                            <Loader size="sm" /> Uniéndose...
+                                          </div>
+                                        ) : (
+                                          "Unirse"
+                                        )
+                                      }
+                                      labelSize="text-md"
+                                      onClick={() =>
+                                        handleShowJoinToast(block.booking)
+                                      }
+                                      isLoading={timeBlocks.isFetching}
+                                      isLoadinglabel="Actualizando..."
+                                    />
+                                    {!timeBlocks.isFetching && (
+                                      <span>{`${playersCount}/${maxPlayers}`}</span>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span>Reservado</span>
+                                )}
+                              </>
+                            )}
+                        </>
+                      )}
                     </td>
-                    <td>{block.table.code}</td>
                   </tr>
                 );
               })}

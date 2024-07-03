@@ -111,7 +111,7 @@ export function Header() {
             </ul>
           </div>
         ) : (
-          <Loader size="lg" />
+          <Loader size="lg" className="text-primary" />
         )}
       </div>
     </div>

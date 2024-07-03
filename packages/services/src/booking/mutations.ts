@@ -63,9 +63,11 @@ export function useUpdateBooking() {
   });
 }
 
-export async function cancelBooking(
-  _id: TUpdateBookingParamsDefinition["_id"],
-) {
+export async function cancelBooking({
+  _id,
+}: {
+  _id: TUpdateBookingParamsDefinition["_id"];
+} & TUpdateBookingInputDefinition) {
   const res = await api.post(`/booking/${encodeURIComponent(`${_id}`)}/cancel`);
   const booking: IBooking = await res.json();
   return booking;
