@@ -40,7 +40,7 @@ export default function Tournaments() {
               key={index}
               labelName={tournament.name}
               label={tournament.description}
-              labelButton="Editar Torneo"
+              labelButton="Ver Torneo"
               onClick={() =>
                 router.push(`/tournaments/edit-tournament/${tournament._id}`)
               }

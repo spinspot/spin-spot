@@ -12,11 +12,16 @@ import {
   createTournamentInputDefinition,
 } from "@spin-spot/models";
 import { useCreateTournament, useToast } from "@spin-spot/services";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { useRouter } from "next/navigation";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
+// Importa el plugin UTC de dayjs
+dayjs.extend(utc);
+
 const eventTypeOptions = ["1V1", "2V2"];
-const tournamentTypeOptions = ["MEDIUM", "ADVANCED", "BEGINNER"];
+const tournamentTypeOptions = ["BEGINNER", "MEDIUM", "ADVANCED"];
 const tournamentFormatOptions = ["LEAGUE", "ELIMINATION"];
 
 export default function Create() {
@@ -55,6 +60,8 @@ export default function Create() {
         owner: "665229652dc1249bcd4611b7", // Cambiar esto a user?._id || " " cuando esté listo
         status: "OPEN",
         location: "UNIMET",
+        startTime: adjustDateToUTC(data.startTime?.toString()),
+        endTime: adjustDateToUTC(data.endTime?.toString()),
       },
       {
         onSuccess: () => {
@@ -82,6 +89,16 @@ export default function Create() {
       type: "error",
       duration: 3000,
     });
+  };
+
+  const adjustDateToUTC = (date: string | undefined): Date => {
+    const utcDate = dayjs(date).utc(); // Convierte a UTC
+
+    // Aplica el offset horario de Caracas (GMT-4)
+    const caracasOffset = -11 * 60; // En minutos
+    const caracasTime = utcDate.subtract(caracasOffset, "minute");
+
+    return caracasTime.toDate(); // Devuelve la fecha y hora en formato ISO string con offset de Caracas
   };
 
   return (
@@ -200,10 +217,7 @@ export default function Create() {
             control={control}
             name="startTime"
             render={({ field }) => (
-              <Calendar
-                onDateChange={(date) => field.onChange(date)}
-                endDate={watch("endTime")}
-              />
+              <Calendar onDateChange={(date) => field.onChange(date)} />
             )}
           />
         </div>

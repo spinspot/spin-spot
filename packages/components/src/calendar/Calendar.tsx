@@ -5,6 +5,7 @@ import { useState } from "react";
 import { DayPicker } from "react-day-picker";
 
 const today = new Date();
+console.log(today);
 const fromMonth = new Date(today.getFullYear(), today.getMonth());
 const todayDate = new Date(
   today.getFullYear(),
