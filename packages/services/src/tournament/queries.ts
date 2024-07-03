@@ -1,6 +1,7 @@
 import {
   IPopulatedTournament,
   TGetTournamentParamsDefinition,
+  TGetUserParamsDefinition,
 } from "@spin-spot/models";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api";
@@ -53,4 +54,17 @@ export async function getNotClosedTournaments() {
 
 export function useNotClosedTournaments(){
   return useQuery({ queryKey: ["getNotClosedTournaments"], queryFn: getNotClosedTournaments });
+}
+
+export async function getUserTournaments(userId: TGetUserParamsDefinition["_id"]) {
+  const res = await api.get(`/tournaments/user/${encodeURIComponent(`${userId}`)}`);
+  const tournaments: IPopulatedTournament[] = await res.json();
+  return tournaments;
+}
+
+export function useUserTournaments(userId: TGetUserParamsDefinition["_id"]) {
+  return useQuery({
+    queryKey: ["getUserTournaments", userId],
+    queryFn: () => getUserTournaments(userId),
+  });
 }
