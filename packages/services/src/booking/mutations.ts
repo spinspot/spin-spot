@@ -75,10 +75,64 @@ export async function cancelBooking({
 
 export function useCancelBooking() {
   const queryClient = useQueryClient();
-
+ 
   return useMutation({
     mutationKey: ["cancelBooking"],
     mutationFn: cancelBooking,
+    onSuccess(data) {
+      queryClient.invalidateQueries({ queryKey: ["getTimeBlocks"] });
+      queryClient.invalidateQueries({ queryKey: ["getBookings"] });
+      queryClient.invalidateQueries({
+        queryKey: ["getTimeBlock", data.timeBlock],
+      });
+      queryClient.invalidateQueries({ queryKey: ["getBooking", data._id] });
+    },
+  });
+}
+
+export async function joinBooking({
+  _id,
+}: {
+  _id: TUpdateBookingParamsDefinition["_id"];
+} & TUpdateBookingInputDefinition) {
+  const res = await api.post(`/booking/${encodeURIComponent(`${_id}`)}/join`);
+  const booking: IBooking = await res.json();
+  return booking;
+}
+
+export function useJoinBooking() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["joinBooking"],
+    mutationFn: joinBooking,
+    onSuccess(data) {
+      queryClient.invalidateQueries({ queryKey: ["getTimeBlocks"] });
+      queryClient.invalidateQueries({ queryKey: ["getBookings"] });
+      queryClient.invalidateQueries({
+        queryKey: ["getTimeBlock", data.timeBlock],
+      });
+      queryClient.invalidateQueries({ queryKey: ["getBooking", data._id] });
+    },
+  });
+}
+
+export async function leaveBooking({
+  _id,
+}: {
+  _id: TUpdateBookingParamsDefinition["_id"];
+} & TUpdateBookingInputDefinition) {
+  const res = await api.post(`/booking/${encodeURIComponent(`${_id}`)}/leave`);
+  const booking: IBooking = await res.json();
+  return booking;
+}
+
+export function useLeaveBooking() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["leaveBooking"],
+    mutationFn: leaveBooking,
     onSuccess(data) {
       queryClient.invalidateQueries({ queryKey: ["getTimeBlocks"] });
       queryClient.invalidateQueries({ queryKey: ["getBookings"] });

@@ -6,10 +6,11 @@ import {
   useAuth,
   useAvailableUsers,
   useCancelBooking,
+  useJoinBooking,
+  useLeaveBooking,
   useTables,
   useTimeBlocks,
   useToast,
-  useUpdateBooking,
   useUpdateTimeBlock,
 } from "@spin-spot/services";
 import { cn } from "@spin-spot/utils";
@@ -32,9 +33,10 @@ export default function Tables() {
   const router = useRouter();
   const availableUsers = useAvailableUsers();
   const { showToast } = useToast();
-  const updateBooking = useUpdateBooking();
   const updateTimeBlock = useUpdateTimeBlock();
   const cancelBooking = useCancelBooking();
+  const joinBooking = useJoinBooking();
+  const leaveBooking = useLeaveBooking();
 
   const [loadingBlockId, setLoadingBlockId] = useState<string | null>(null);
 
@@ -140,11 +142,9 @@ export default function Tables() {
     }
 
     if (user?._id) {
-      const playerIds = booking.players.map((player) => player._id);
-      const newPlayers = [...playerIds, user._id];
       setLoadingBlockId(booking.timeBlock.toString());
-      updateBooking.mutate(
-        { _id: booking._id, players: newPlayers },
+      joinBooking.mutate(
+        { _id: booking._id },
         {
           onSuccess() {
             showToast({
@@ -191,11 +191,10 @@ export default function Tables() {
 
   function handleSalirse(booking: IPopulatedBooking) {
     if (user?._id) {
-      const playerIds = booking.players.map((player) => player._id);
-      const newPlayers = playerIds.filter((playerId) => playerId !== user._id);
       setLoadingBlockId(booking.timeBlock.toString());
-      updateBooking.mutate(
-        { _id: booking._id, players: newPlayers },
+
+      leaveBooking.mutate(
+        { _id: booking._id },
         {
           onSuccess() {
             showToast({
