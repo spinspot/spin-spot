@@ -252,7 +252,7 @@ export default function EditReserve({ params }: { params: ReserveProps }) {
         initialActive={eventType === "1V1" ? 0 : 1}
         initialIndumentary={initialIndumentaryIndex}
       />
-      <div className="flex w-full flex-col items-center justify-center max-sm:p-6 sm:mt-4">
+      <div className="mt-4 flex w-full flex-col items-center justify-center px-10 lg:px-72">
         {eventType && (
           <PlayerInput
             searchTexts={searchTexts}
@@ -263,7 +263,7 @@ export default function EditReserve({ params }: { params: ReserveProps }) {
           />
         )}
       </div>
-      <div className="flex w-full flex-col justify-center gap-2 max-sm:px-6 sm:mt-6">
+      <div className="mt-6 flex w-full flex-col justify-center gap-2 px-10 lg:px-72">
         <Button
           label="Editar"
           labelSize="text-sm"
