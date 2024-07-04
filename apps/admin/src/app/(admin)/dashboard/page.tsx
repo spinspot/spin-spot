@@ -5,8 +5,13 @@ import {
   TrophyIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import { Button, Card, Loader, PingPongIcon } from "@spin-spot/components";
-import Stat from "@spin-spot/components/stats/Stat";
+import {
+  Button,
+  Card,
+  Loader,
+  PingPongIcon,
+  Stat,
+} from "@spin-spot/components";
 import {
   useAuth,
   useBookings,
