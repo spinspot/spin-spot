@@ -23,12 +23,6 @@ async function bookingWithUser(req: Request, res: Response) {
     reservationData.timeBlock,
   );
 
-  if (user?._id?.toString() !== reservationData.owner) {
-    return res
-      .status(401)
-      .json({ error: "You cannot create a booking for a different user" });
-  }
-
   if (!timeBlock || !timeBlock.table || timeBlock.status !== "AVAILABLE") {
     throw new ApiError({
       status: 400,
@@ -53,6 +47,36 @@ async function bookingWithUser(req: Request, res: Response) {
     });
   }
 
+  const session = await startSession();
+
+  if (reservationData.eventType === "PRIVATE") {
+    const booking = await session.withTransaction(async () => {
+      const booking = await bookingService.createBooking({
+        ...reservationData,
+        table: table!._id,
+      });
+
+      await timeBlockService.updateTimeBlock(reservationData.timeBlock, {
+        booking: booking._id,
+        status: "BOOKED",
+      });
+
+      return booking;
+    });
+
+    return res.status(200).json(booking);
+  }
+
+  if (
+    user?.userType === "PLAYER" &&
+    user?._id?.toString() !== reservationData.owner
+  ) {
+    throw new ApiError({
+      status: 401,
+      errors: [{ message: "No puedes crear una reserva para otro usuario" }],
+    });
+  }
+
   const uniquePlayers =
     new Set(reservationData.players?.map((player) => `${player}`)).size ===
     reservationData.players?.length;
@@ -63,14 +87,12 @@ async function bookingWithUser(req: Request, res: Response) {
       errors: [{ message: "Hay jugadores repetidos en la reserva" }],
     });
   }
-  if (!(await userService.isUserAvailable(user?._id.toString() ?? ""))) {
+  if (!(await userService.isUserAvailable(reservationData.owner ?? ""))) {
     throw new ApiError({
       status: 400,
       errors: [{ message: "Ya tienes una Reserva Activa" }],
     });
   }
-
-  const session = await startSession();
 
   const booking = await session.withTransaction(async () => {
     const booking = await bookingService.createBooking({

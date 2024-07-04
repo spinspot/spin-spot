@@ -308,9 +308,11 @@ export default function Tables() {
                     <td>
                       {blockDate.isBefore(now) ? (
                         <span>El horario ya ha pasado</span>
+                      ) : block.booking?.eventType === "PRIVATE" ? (
+                        <span>Reservado</span>
                       ) : (
                         <>
-                          {block.status.toLowerCase() === "available" && (
+                          {block.status === "AVAILABLE" && (
                             <Button
                               className="btn-primary btn-sm"
                               label="Reservar"

@@ -17,6 +17,7 @@ import {
   useTable,
   useTimeBlock,
   useToast,
+  useUpdateTimeBlock,
   useUsers,
 } from "@spin-spot/services";
 import { useRouter } from "next/navigation";
@@ -62,6 +63,7 @@ export default function Reserve({ params }: { params: ReserveParams }) {
   const createBooking = useCreateBooking();
   const availableUsers = useAvailableUsers();
   const invitePlayer = useInvitePlayer();
+  const updateTimeBlock = useUpdateTimeBlock();
 
   const handleSearch = (index: number, text: string) => {
     const newSearchTexts = [...searchTexts];
@@ -123,13 +125,13 @@ export default function Reserve({ params }: { params: ReserveParams }) {
 
     const validPlayers = [
       ...(selectedUsers.filter((player) => player !== null) as string[]),
-      user._id,
+      selectedOwner,
     ];
 
-    if (!availableUsers.data?.some((item) => item._id === user._id)) {
+    if (!availableUsers.data?.some((item) => item._id === selectedOwner)) {
       showToast({
         label:
-          "No puede realizar la reserva debido a que usted ya forma parte de otra reserva",
+          "No puede realizar la reserva debido a que el usuario ya forma parte de otra reserva",
         type: "error",
       });
       return;
@@ -160,7 +162,7 @@ export default function Reserve({ params }: { params: ReserveParams }) {
                 booking: booking._id,
               });
             });
-            router.push("/tables");
+            router.push("/reserves");
           },
           onError: (error) => {
             console.error("Error al crear la reserva:", error);
@@ -199,6 +201,33 @@ export default function Reserve({ params }: { params: ReserveParams }) {
     }
   };
 
+  const handlePrivateBooking = async () => {
+    if (!timeBlock.data) {
+      return showToast({
+        label: "No se encontró el bloque horario",
+        type: "error",
+      });
+    }
+
+    createBooking.mutate(
+      {
+        eventType: "PRIVATE",
+        table: timeBlock.data.table._id,
+        timeBlock: params.timeBlockId,
+        status: "PENDING",
+      },
+      {
+        onSuccess: () => {
+          showToast({
+            label: "Reserva creada exitosamente",
+            type: "success",
+          });
+          router.push("/reserves");
+        },
+      },
+    );
+  };
+
   useEffect(() => {
     if (
       ![timeBlock.status, table.status, users.status].some(
@@ -228,7 +257,7 @@ export default function Reserve({ params }: { params: ReserveParams }) {
     <div className="font-body flex-grow px-64 py-32">
       {adminState === null ? (
         <div className="flex w-full flex-col items-center justify-center max-sm:p-6 sm:mt-4">
-          <h2 className=" text-center text-3xl">
+          <h2 className="text-center text-3xl">
             Ingrese el dueño de la reserva
           </h2>
           <PlayerInput
@@ -255,6 +284,20 @@ export default function Reserve({ params }: { params: ReserveParams }) {
               labelSize="text-sm"
               className="btn-md btn-link text-secondary mx-auto !no-underline"
               onClick={() => router.back()}
+            />
+          </div>
+          <div className="mt-4 flex w-full items-center gap-4">
+            <hr className="flex-1" />
+            <span>o</span>
+            <hr className="flex-1" />
+          </div>
+          <div className="mt-4 flex w-full flex-col justify-center gap-2 px-5 max-sm:px-6 sm:mt-6">
+            <Button
+              label="Reservar para eventos privados"
+              labelSize="text-sm"
+              className="btn-secondary"
+              onClick={handlePrivateBooking}
+              isLoadinglabel="Reservando..."
             />
           </div>
         </div>
@@ -334,7 +377,7 @@ export default function Reserve({ params }: { params: ReserveParams }) {
                   : "btn-primary btn-md btn-disabled"
               }
               onClick={handleReserve}
-              isLoading={!createBooking.isIdle}
+              isLoading={createBooking.isPending}
               isLoadinglabel="Reservando..."
             />
             {createBooking.isIdle && (

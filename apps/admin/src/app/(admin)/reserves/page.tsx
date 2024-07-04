@@ -308,6 +308,21 @@ export default function reserves() {
                     <td>
                       {blockDate.isBefore(now) ? (
                         <span>El horario ya ha pasado</span>
+                      ) : block.booking?.eventType === "PRIVATE" ? (
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <span>Reserva privada</span>
+                          <Button
+                            className="btn-link text-secondary btn-sm !no-underline"
+                            label="Eiminar"
+                            labelSize="text-md"
+                            onClick={() =>
+                              handleShowCancelationToast(
+                                block._id.toString(),
+                                block.booking?._id.toString(),
+                              )
+                            }
+                          />
+                        </div>
                       ) : (
                         <>
                           {block.status.toLowerCase() === "available" && (
