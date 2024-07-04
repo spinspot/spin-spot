@@ -42,7 +42,7 @@ export default function editUserAdmin({ params }: { params: editUserParams }) {
       lastName: user?.data?.lastName,
       email: user?.data?.email,
       gender: user?.data?.gender,
-      userType: user?.data?.userType,
+      // userType: user?.data?.userType,
       isActive: user?.data?.isActive ? "ACTIVO" : "BLOQUEADO",
     },
     shouldFocusError: false,
@@ -78,7 +78,7 @@ export default function editUserAdmin({ params }: { params: editUserParams }) {
       setValue("lastName", user.data.lastName);
       setValue("email", user.data.email);
       setValue("gender", user.data.gender);
-      setValue("userType", user.data.userType);
+      // setValue("userType", user.data.userType);
       // Convirtiendo isActive a "ACTIVA" o "INACTIVA" para el SelectInput
       setValue("isActive", user.data.isActive ? "ACTIVO" : "BLOQUEADO");
     }
@@ -154,7 +154,7 @@ export default function editUserAdmin({ params }: { params: editUserParams }) {
           }
           bottomLeftLabel={errors.email?.message}
         />
-        <SelectInput
+        {/* <SelectInput
           options={["PLAYER", "ADMIN"]}
           defaultOption="Seleccione tipo de usuario"
           topRightLabel="Tipo"
@@ -166,7 +166,7 @@ export default function editUserAdmin({ params }: { params: editUserParams }) {
               : "dark:text-base-300",
           )}
           bottomLeftLabel={errors.userType?.message}
-        />
+        /> */}
         <SelectInput
           options={["MALE", "FEMALE", "OTHER"]}
           defaultOption="Elige tu Género"
