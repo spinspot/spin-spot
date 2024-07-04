@@ -311,17 +311,27 @@ export default function reserves() {
                       ) : block.booking?.eventType === "PRIVATE" ? (
                         <div className="flex flex-col items-center justify-center gap-2">
                           <span>Reserva privada</span>
-                          <Button
-                            className="btn-link text-secondary btn-sm !no-underline"
-                            label="Eiminar"
-                            labelSize="text-md"
-                            onClick={() =>
-                              handleShowCancelationToast(
-                                block._id.toString(),
-                                block.booking?._id.toString(),
-                              )
-                            }
-                          />
+                          {cancelBooking.isPending || timeBlocks.isFetching ? (
+                            <div className="mt-2 flex items-center justify-center">
+                              <Loader
+                                className="text-secondary"
+                                size="md"
+                                variant="dots"
+                              />
+                            </div>
+                          ) : (
+                            <Button
+                              className="btn-link text-secondary btn-sm !no-underline"
+                              label="Eiminar"
+                              labelSize="text-md"
+                              onClick={() =>
+                                handleShowCancelationToast(
+                                  block._id.toString(),
+                                  block.booking?._id.toString(),
+                                )
+                              }
+                            />
+                          )}
                         </div>
                       ) : (
                         <>
@@ -340,13 +350,15 @@ export default function reserves() {
                               <Button
                                 className={cn(
                                   "btn-secondary btn-sm mx-2 w-20",
-                                  !cancelBooking.isIdle && "btn-disabled",
+                                  cancelBooking.isPending ||
+                                    (timeBlocks.isFetching && "btn-disabled"),
                                 )}
                                 label="Editar"
                                 labelSize="text-md"
                                 onClick={() => handleEdit(`${block._id}`)}
                               />
-                              {!cancelBooking.isIdle ? (
+                              {cancelBooking.isPending ||
+                              timeBlocks.isFetching ? (
                                 <div className="mt-2 flex items-center justify-center">
                                   <Loader
                                     className="text-secondary"
