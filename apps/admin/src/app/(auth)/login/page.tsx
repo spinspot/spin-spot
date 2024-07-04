@@ -82,7 +82,7 @@ export default function Login() {
           label="Iniciar Sesión"
           labelSize="text-md"
           onClick={handleSubmit(handleSignIn)}
-          isLoading={!signInWithCredentials.isIdle}
+          isLoading={signInWithCredentials.isPending}
           isLoadinglabel="Iniciando Sesión..."
         />
         <div className="flex justify-center">
