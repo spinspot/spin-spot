@@ -15,7 +15,6 @@ import { useScrollLock } from "usehooks-ts";
 export default function Login() {
   const router = useRouter();
   const signInWithCredentials = useSignInWithCredentials();
-
   useScrollLock();
 
   const {
