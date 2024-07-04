@@ -11,8 +11,18 @@ import { IPopulatedTeam } from "../team";
 import { IUser } from "../user";
 
 export const tournamentDefinition = baseModelDefinition.extend({
-  name: z.string().nonempty("El nombre no puede estar vacío"),
-  description: z.string().nonempty("La descripción no puede estar vacío"),
+  name: z
+    .string()
+    .nonempty("El nombre no puede estar vacío")
+    .refine((val) => val.trim().length > 0, {
+      message: "El nombre no puede contener espacios en blanco",
+    }),
+  description: z
+    .string()
+    .nonempty("La descripción no puede estar vacío")
+    .refine((val) => val.trim().length > 0, {
+      message: "La descripción no puede contener espacios en blanco",
+    }),
   owner: z
     .instanceof(Types.ObjectId)
     .or(z.string().refine(isValidObjectId))
