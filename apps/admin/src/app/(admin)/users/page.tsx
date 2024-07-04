@@ -1,7 +1,7 @@
 "use client";
 
 import { UserGroupIcon } from "@heroicons/react/24/outline";
-import { Badge, Card, Loader, TextInput } from "@spin-spot/components"; // Assuming TextInput is part of the components
+import { Badge, Card, Loader, TextInput } from "@spin-spot/components"; 
 import { useUsers } from "@spin-spot/services";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
