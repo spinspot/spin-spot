@@ -26,7 +26,6 @@ export default function UserService() {
         lastName: "Doe",
         gender: "MALE",
         password: "password123A",
-        userType: "PLAYER",
         isActive: true,
       },
       {
@@ -48,6 +47,7 @@ export default function UserService() {
             signInWithCredentials.mutate({
               email: "new@mail.com",
               password: "password123A",
+              userType: "PLAYER",
             })
           }
         >
