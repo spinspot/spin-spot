@@ -318,7 +318,9 @@ export default function Tables() {
                               label="Reservar"
                               labelSize="text-md"
                               onClick={() => handleReserve(`${block._id}`)}
-                              isLoading={timeBlocks.isFetching}
+                              isLoading={
+                                timeBlocks.isFetching || cancelBooking.isPending
+                              }
                               isLoadinglabel="Actualizando..."
                             />
                           )}

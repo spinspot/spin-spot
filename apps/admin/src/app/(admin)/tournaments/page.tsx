@@ -34,7 +34,7 @@ export default function Tournaments() {
         </div>
       </div>
       <div className="mt-6 flex justify-center">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {isLoading ? (
             <Loader />
           ) : (
@@ -42,8 +42,9 @@ export default function Tournaments() {
               <Card
                 labelName={tournament.name}
                 label={tournament.description}
-                labelButton="Ver/Editar Torneo"
-                image={false}
+                labelButton="Ver Torneo"
+                image={true}
+                imageSrc="/tournamentBackGround.svg"
                 onClick={() =>
                   router.push(`/tournaments/edit-tournament/${tournament._id}`)
                 }

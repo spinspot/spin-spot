@@ -57,7 +57,12 @@ export default function editTableAdmin({
   > = (data) => {
     table.data &&
       updateTable.mutate(
-        { _id: table.data?._id, ...data, isActive: data.isActive === "ACTIVA" },
+        {
+          _id: table.data?._id,
+          ...data,
+          isActive: data.isActive === "ACTIVA",
+          code: data.code?.trim(),
+        },
         {
           onSuccess: () => {
             showToast({

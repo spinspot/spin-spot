@@ -40,7 +40,7 @@ export default function createTableAdmin() {
     Omit<TCreateTableInputDefinition, "isActive"> & { isActive: string }
   > = (data) => {
     createTable.mutate(
-      { ...data, isActive: data.isActive === "ACTIVA" },
+      { ...data, code: data.code.trim(), isActive: data.isActive === "ACTIVA" },
       {
         onSuccess: () => {
           showToast({
