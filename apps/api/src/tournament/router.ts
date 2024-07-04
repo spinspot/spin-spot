@@ -22,5 +22,10 @@ tournamentRouter.get(
   "/:_id/participants",
   tournamentController.getTournamentParticipants,
 );
+tournamentRouter.get(
+  "/user/:userId",
+  tournamentController.getUserTournaments,
+);
+
 
 export { tournamentRouter };

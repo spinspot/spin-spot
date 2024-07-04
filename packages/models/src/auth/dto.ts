@@ -5,6 +5,7 @@ import { IUser, userDefinition } from "../user";
 export const signInWithCredentialsInputDefinition = userDefinition.pick({
   email: true,
   password: true,
+  userType: true,
 });
 export type TSignInWithCredentialsInputDefinition = z.infer<
   typeof signInWithCredentialsInputDefinition

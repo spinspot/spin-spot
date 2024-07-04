@@ -204,6 +204,12 @@ async function getTournamentParticipants(req: Request, res: Response) {
   return res.status(200).json(participants);
 }
 
+async function getUserTournaments(req: Request, res: Response) {
+  const userId = req.params.userId;
+  const tournaments = await tournamentService.getUserTournaments(userId);
+  return res.status(200).json(tournaments);
+}
+
 export const tournamentController = {
   getTournament,
   getTournaments,
@@ -212,4 +218,5 @@ export const tournamentController = {
   joinTournament,
   leaveTournament,
   getTournamentParticipants,
+  getUserTournaments
 } as const;

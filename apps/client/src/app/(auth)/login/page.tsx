@@ -27,6 +27,9 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm<TSignInWithCredentialsInputDefinition>({
+    defaultValues: {
+      userType: "PLAYER",
+    },
     resolver: zodResolver(signInWithCredentialsInputDefinition),
     shouldFocusError: false,
     mode: "onBlur",
@@ -43,17 +46,11 @@ export default function Login() {
   const handleSignIn: SubmitHandler<TSignInWithCredentialsInputDefinition> = (
     data,
   ) => {
-    signInWithCredentials.mutate(
-      {
-        email: data.email,
-        password: data.password,
+    signInWithCredentials.mutate(data, {
+      onSuccess() {
+        router.push("/dashboard");
       },
-      {
-        onSuccess() {
-          router.push("/dashboard");
-        },
-      },
-    );
+    });
   };
 
   return (
@@ -91,7 +88,7 @@ export default function Login() {
           label="Iniciar Sesión"
           labelSize="text-md"
           onClick={handleSubmit(handleSignIn)}
-          isLoading={!signInWithCredentials.isIdle}
+          isLoading={signInWithCredentials.isPending}
           isLoadinglabel="Iniciando Sesión..."
         />
         <Button
