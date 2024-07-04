@@ -23,6 +23,9 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm<TSignInWithCredentialsInputDefinition>({
+    defaultValues: {
+      userType: "ADMIN",
+    },
     resolver: zodResolver(signInWithCredentialsInputDefinition),
     shouldFocusError: false,
     mode: "onBlur",
@@ -35,18 +38,11 @@ export default function Login() {
   const handleSignIn: SubmitHandler<TSignInWithCredentialsInputDefinition> = (
     data,
   ) => {
-    signInWithCredentials.mutate(
-      {
-        email: data.email,
-        password: data.password,
-        userType: "ADMIN",
+    signInWithCredentials.mutate(data, {
+      onSuccess() {
+        router.push("/dashboard");
       },
-      {
-        onSuccess() {
-          router.push("/dashboard");
-        },
-      },
-    );
+    });
   };
   return (
     <div className="flex flex-col items-center justify-center">
