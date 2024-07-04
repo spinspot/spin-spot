@@ -1,4 +1,6 @@
-import { LayoutMain } from "@spin-spot/components";
+"use client";
+
+import { AuthGuard, LayoutMain } from "@spin-spot/components";
 
 export default function AdminLayout({
   children,
@@ -7,8 +9,9 @@ export default function AdminLayout({
 }) {
   return (
     <LayoutMain isAdmin={true}>
-      {children}
-      {/* <AuthGuard>{children}</AuthGuard> */}
+      <AuthGuard validate={(user) => user?.userType === "ADMIN"} route="/login">
+        {children}
+      </AuthGuard>
     </LayoutMain>
   );
 }
