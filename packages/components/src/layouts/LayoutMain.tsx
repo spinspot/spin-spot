@@ -1,10 +1,15 @@
 import { Footer } from "../footers";
 import { Header } from "../headers";
 
-export function LayoutMain({ children }: { children: React.ReactNode }) {
+interface LayoutMainProps {
+  children: React.ReactNode;
+  isAdmin?: boolean;
+}
+
+export function LayoutMain({ children, isAdmin = false }: LayoutMainProps) {
   return (
     <div className={`flex min-h-screen flex-col`}>
-      <Header />
+      <Header isAdmin={isAdmin} />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 import { SpinSpotIcon } from "../extra-icons";
 import { Loader } from "../loaders";
 
-export function Header() {
+interface HeaderProps {
+  isAdmin?: boolean;
+}
+
+export function Header({ isAdmin = false }: HeaderProps) {
   const user = useAuth();
   const signOut = useSignOut();
   const router = useRouter();
@@ -25,12 +29,20 @@ export function Header() {
     router.push("/tables");
   };
 
+  const handleReservesClick = () => {
+    router.push("/resrves");
+  };
+
   const handleHomeClick = () => {
     router.push("/dashboard");
   };
 
   const handleTournamentsClick = () => {
     router.push("/tournaments");
+  };
+
+  const handleUsersClick = () => {
+    router.push("/users");
   };
 
   return (
@@ -53,20 +65,43 @@ export function Header() {
               />
             </svg>
           </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-200 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-          >
-            <li>
-              <a onClick={handleHomeClick}>Home</a>
-            </li>
-            <li>
-              <a onClick={handleTablesClick}>Mesas</a>
-            </li>
-            <li>
-              <a onClick={handleTournamentsClick}>Torneos</a>
-            </li>
-          </ul>
+          {isAdmin ? (
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content bg-base-200 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            >
+              <li>
+                <a onClick={handleHomeClick}>Dashboard</a>
+              </li>
+              <li>
+                <a onClick={handleTablesClick}>Gestión de Mesas</a>
+              </li>
+              <li>
+                <a onClick={handleTournamentsClick}>Gestión de Torneos</a>
+              </li>
+              <li>
+                <a onClick={handleReservesClick}>Gestión de Reservas</a>
+              </li>
+              <li>
+                <a onClick={handleUsersClick}>Gestión de Usuarios</a>
+              </li>
+            </ul>
+          ) : (
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content bg-base-200 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            >
+              <li>
+                <a onClick={handleHomeClick}>Home</a>
+              </li>
+              <li>
+                <a onClick={handleTablesClick}>Mesas</a>
+              </li>
+              <li>
+                <a onClick={handleTournamentsClick}>Torneos</a>
+              </li>
+            </ul>
+          )}
         </div>
       </div>
       <div className="navbar-center">
@@ -111,7 +146,7 @@ export function Header() {
             </ul>
           </div>
         ) : (
-          <Loader size="lg" />
+          <Loader size="lg" className="text-primary" />
         )}
       </div>
     </div>

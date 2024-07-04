@@ -271,6 +271,8 @@ export default function EditReserve({ params }: { params: ReserveProps }) {
               : "btn-primary btn-md btn-disabled"
           }
           onClick={handleUpdate}
+          isLoading={!updateBooking.isIdle}
+          isLoadinglabel="Editando..."
         />
         <Button
           label="Cancelar"

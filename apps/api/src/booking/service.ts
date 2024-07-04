@@ -2,6 +2,7 @@ import {
   IPopulatedBooking,
   TGetBookingParamsDefinition,
   TGetBookingsQueryDefinition,
+  TGetUserParamsDefinition,
   TUpdateBookingInputDefinition,
   TUpdateBookingParamsDefinition,
   bookingSchema,
@@ -55,9 +56,27 @@ async function updateBooking(
   return booking;
 }
 
+async function getBookingsByPlayer(playerId: TGetUserParamsDefinition["_id"]) {
+  const bookings = await Booking.find({ 
+    players: playerId, 
+    owner: { $ne: playerId },
+    status: "PENDING"
+  }).populate([
+    "owner",
+    "players",
+    "table",
+    {
+      path: "timeBlock",
+      populate: "table",
+    },
+  ]);
+  return bookings;
+}
+
 export const bookingService = {
   createBooking,
   getBookings,
   getBooking,
   updateBooking,
+  getBookingsByPlayer,
 } as const;

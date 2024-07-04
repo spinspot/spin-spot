@@ -1,9 +1,13 @@
 import z from "zod";
 import { baseModelDefinition } from "../definitions";
-import { userDefinition } from "../user";
 
 const tableDefinition = baseModelDefinition.extend({
-  code: z.string(),
+  code: z
+    .string()
+    .nonempty("El código no puede estar vacío")
+    .refine((val) => !isNaN(Number(val)), {
+      message: "El código debe ser un número",
+    }),
   isActive: z.boolean(),
 });
 
@@ -29,7 +33,7 @@ export type TUpdateTableParamsDefinition = z.infer<
   typeof getTableParamsDefinition
 >;
 
-export const updateTableInputDefinition = userDefinition.partial();
+export const updateTableInputDefinition = tableDefinition.partial();
 export type TUpdateTableInputDefinition = z.infer<
   typeof updateTableInputDefinition
 >;

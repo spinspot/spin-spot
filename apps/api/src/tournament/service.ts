@@ -53,9 +53,40 @@ async function updateTournament(
   return tournament;
 }
 
+async function getParticipants(_id: TGetTournamentsQueryDefinition["_id"]) {
+  const tournament = await Tournament.findById<IPopulatedTournament>(_id)
+    .populate([
+      {
+        path: "players",
+        select: "_id firstName lastName",
+      },
+      {
+        path: "teams",
+        populate: {
+          path: "players",
+          select: "_id firstName lastName",
+        },
+      },
+    ])
+    .exec();
+
+  if (!tournament) {
+    throw new Error("Tournament not found");
+  }
+
+  if (tournament.eventType === "1V1") {
+    return tournament.players;
+  } else if (tournament.eventType === "2V2") {
+    return tournament.teams;
+  } else {
+    throw new Error("Invalid event type");
+  }
+}
+
 export const tournamentService = {
   createTournament,
   getTournament,
   getTournaments,
   updateTournament,
+  getParticipants,
 } as const;

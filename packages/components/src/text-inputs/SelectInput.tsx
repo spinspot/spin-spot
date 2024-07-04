@@ -28,7 +28,7 @@ export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
     const renderTopLabels = topLeftLabel || topRightLabel;
     const renderBottomLabels = bottomLeftLabel || bottomRightLabel;
 
-    const generateValue = (label: string) => {
+    const generateValue = (label: any) => {
       return label.replace(/\s+/g, "-");
     };
 
@@ -47,7 +47,10 @@ export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
         <div className="relative w-full">
           <select
             ref={ref}
-            className={cn("select select-bordered w-full ", className)}
+            className={cn(
+              "select select-bordered select-primary w-full ",
+              className,
+            )}
             defaultValue=""
             {...props}
           >
