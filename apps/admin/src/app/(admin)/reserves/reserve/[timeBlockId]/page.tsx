@@ -337,7 +337,7 @@ export default function Reserve({ params }: { params: ReserveParams }) {
             setIndumentary={setIndumentary}
             resetInputs={resetInputs}
           />
-          <div className="mx-4 flex w-full flex-col items-center justify-center max-sm:p-6 sm:mt-4">
+          <div className="flex w-full flex-col items-center justify-center max-sm:p-6 sm:mt-4">
             {eventType && (
               <>
                 <h3 className="text-center text-lg">
