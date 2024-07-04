@@ -23,9 +23,6 @@ export default function dashboard() {
   const tables = useTables();
   const bookings = useBookings();
   const router = useRouter();
-
-  console.log(users);
-
   const statsData = [
     {
       icon: <UserGroupIcon className="inline-block h-8 w-8 stroke-current" />,
