@@ -240,6 +240,7 @@ export default function EditReserve({ params }: { params: ReserveProps }) {
         />
       )}
       <SelectionSection
+        isAdmin={null}
         options={options}
         optinosNo={optinosNo}
         eventType={eventType}

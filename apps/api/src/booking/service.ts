@@ -26,9 +26,7 @@ async function getBookings(filter: TGetBookingsQueryDefinition = {}) {
 }
 
 async function getBooking(_id: TGetBookingParamsDefinition["_id"]) {
-  const booking = await Booking.findById<IPopulatedBooking>(
-    _id,
-  ).populate([
+  const booking = await Booking.findById<IPopulatedBooking>(_id).populate([
     "owner",
     "players",
     "table",
@@ -57,10 +55,10 @@ async function updateBooking(
 }
 
 async function getBookingsByPlayer(playerId: TGetUserParamsDefinition["_id"]) {
-  const bookings = await Booking.find({ 
-    players: playerId, 
+  const bookings = await Booking.find({
+    players: playerId,
     owner: { $ne: playerId },
-    status: "PENDING"
+    status: "PENDING",
   }).populate([
     "owner",
     "players",

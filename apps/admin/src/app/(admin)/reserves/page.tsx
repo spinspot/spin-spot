@@ -22,7 +22,7 @@ import { useEffect, useMemo, useState } from "react";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export default function Tables() {
+export default function reserves() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date(),
   );
@@ -98,14 +98,14 @@ export default function Tables() {
   }, [tables]);
 
   function handleReserve(timeBlockId: string) {
-    router.push(`/reserve/${timeBlockId}`);
+    router.push(`/reserves/reserve/${timeBlockId}`);
     console.log(
       `Reserva solicitada para el bloque de tiempo con ID: ${timeBlockId}`,
     );
   }
 
   function handleEdit(timeBlockId: string) {
-    router.push(`/edit-reserve/${timeBlockId}`);
+    router.push(`/reserves/edit-reserve/${timeBlockId}`);
     console.log(
       `Editar reserva solicitada para el bloque de tiempo con ID: ${timeBlockId}`,
     );
@@ -309,10 +309,23 @@ export default function Tables() {
                       {blockDate.isBefore(now) ? (
                         <span>El horario ya ha pasado</span>
                       ) : block.booking?.eventType === "PRIVATE" ? (
-                        <span>Reservado</span>
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <span>Reserva privada</span>
+                          <Button
+                            className="btn-link text-secondary btn-sm !no-underline"
+                            label="Eiminar"
+                            labelSize="text-md"
+                            onClick={() =>
+                              handleShowCancelationToast(
+                                block._id.toString(),
+                                block.booking?._id.toString(),
+                              )
+                            }
+                          />
+                        </div>
                       ) : (
                         <>
-                          {block.status === "AVAILABLE" && (
+                          {block.status.toLowerCase() === "available" && (
                             <Button
                               className="btn-primary btn-sm"
                               label="Reservar"
@@ -322,42 +335,41 @@ export default function Tables() {
                               isLoadinglabel="Actualizando..."
                             />
                           )}
-                          {block.status.toLowerCase() === "booked" &&
-                            user?._id === block.booking?.owner && (
-                              <div className="flex flex-col items-center justify-center gap-2">
-                                <Button
-                                  className={cn(
-                                    "btn-secondary btn-sm mx-2 w-20",
-                                    !cancelBooking.isIdle && "btn-disabled",
-                                  )}
-                                  label="Editar"
-                                  labelSize="text-md"
-                                  onClick={() => handleEdit(`${block._id}`)}
-                                />
-                                {!cancelBooking.isIdle ? (
-                                  <div className="mt-2 flex items-center justify-center">
-                                    <Loader
-                                      className="text-secondary"
-                                      size="md"
-                                      variant="dots"
-                                    />
-                                  </div>
-                                ) : (
-                                  <Button
-                                    className="btn-link text-secondary btn-sm !no-underline"
-                                    label="Eiminar"
-                                    labelSize="text-md"
-                                    onClick={() =>
-                                      handleShowCancelationToast(
-                                        block._id.toString(),
-                                        block.booking?._id.toString(),
-                                      )
-                                    }
-                                  />
+                          {block.status.toLowerCase() === "booked" && (
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <Button
+                                className={cn(
+                                  "btn-secondary btn-sm mx-2 w-20",
+                                  !cancelBooking.isIdle && "btn-disabled",
                                 )}
-                              </div>
-                            )}
-                          {block.status === "BOOKED" &&
+                                label="Editar"
+                                labelSize="text-md"
+                                onClick={() => handleEdit(`${block._id}`)}
+                              />
+                              {!cancelBooking.isIdle ? (
+                                <div className="mt-2 flex items-center justify-center">
+                                  <Loader
+                                    className="text-secondary"
+                                    size="md"
+                                    variant="dots"
+                                  />
+                                </div>
+                              ) : (
+                                <Button
+                                  className="btn-link text-secondary btn-sm !no-underline"
+                                  label="Eiminar"
+                                  labelSize="text-md"
+                                  onClick={() =>
+                                    handleShowCancelationToast(
+                                      block._id.toString(),
+                                      block.booking?._id.toString(),
+                                    )
+                                  }
+                                />
+                              )}
+                            </div>
+                          )}
+                          {/* {block.status === "BOOKED" &&
                             user?._id !== block.booking?.owner && (
                               <>
                                 {isUserJoined ? (
@@ -394,7 +406,25 @@ export default function Tables() {
                                             <Loader size="sm" /> Uniéndose...
                                           </div>
                                         ) : (
-                                          "Unirse"
+                                          "Editar"
+                                        )
+                                      }
+                                      labelSize="text-md"
+                                      onClick={() =>
+                                        handleShowJoinToast(block.booking)
+                                      }
+                                      isLoading={timeBlocks.isFetching}
+                                      isLoadinglabel="Actualizando..."
+                                    />
+                                    <Button
+                                      className={`btn-primary btn-sm mx-2 ${loadingBlockId ? "btn-disabled" : ""}`}
+                                      label={
+                                        loadingBlockId === block._id ? (
+                                          <div className="flex items-center justify-center gap-2">
+                                            <Loader size="sm" /> Uniéndose...
+                                          </div>
+                                        ) : (
+                                          "Eliminar"
                                         )
                                       }
                                       labelSize="text-md"
@@ -412,7 +442,7 @@ export default function Tables() {
                                   <span>Reservado</span>
                                 )}
                               </>
-                            )}
+                            )} */}
                         </>
                       )}
                     </td>

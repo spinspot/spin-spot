@@ -18,7 +18,7 @@ export default function Tournaments() {
 
   return (
     <div className="flex-grow">
-      <div className="font-title mt-8 text-center font-bold">
+      <div className="font-title text-center font-bold">
         <h1 className="flex flex-col text-3xl">
           <span>Torneos SpinSpot</span>
         </h1>
@@ -33,21 +33,23 @@ export default function Tournaments() {
           Torneos Activos: {tournaments ? tournaments.length : 0}
         </div>
       </div>
-      <div className="my-6 flex justify-center p-5">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {tournaments?.map((tournament, index) => (
-            <Card
-              key={index}
-              labelName={tournament.name}
-              label={tournament.description}
-              labelButton="Ver Torneo"
-              onClick={() =>
-                router.push(`/tournaments/edit-tournament/${tournament._id}`)
-              }
-              image={true}
-              imageSrc="/tournamentBackGround.svg"
-            />
-          ))}
+      <div className="mt-6 flex justify-center">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {isLoading ? (
+            <Loader />
+          ) : (
+            tournaments?.map((tournament) => (
+              <Card
+                labelName={tournament.name}
+                label={tournament.description}
+                labelButton="Ver/Editar Torneo"
+                image={false}
+                onClick={() =>
+                  router.push(`/tournaments/edit-tournament/${tournament._id}`)
+                }
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

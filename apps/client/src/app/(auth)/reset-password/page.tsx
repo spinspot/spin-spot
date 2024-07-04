@@ -1,14 +1,10 @@
 "use client";
 
 import { KeyIcon } from "@heroicons/react/16/solid";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Loader, TextInput } from "@spin-spot/components";
-import {
-  TResetPasswordInputDefinition,
-  resetPasswordInputDefinition,
-} from "@spin-spot/models";
-import { useResetPassword, useUser } from "@spin-spot/services";
-import { useSearchParams } from "next/navigation";
+import { TResetPasswordInputDefinition } from "@spin-spot/models";
+import { useResetPassword, useToast, useUser } from "@spin-spot/services";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useScrollLock } from "usehooks-ts";
 
@@ -17,6 +13,8 @@ export default function ChangePassword() {
 
   const resetPassword = useResetPassword();
   const serachParams = useSearchParams();
+  const router = useRouter();
+  const { showToast } = useToast();
   const user = useUser(serachParams.get("user") || "");
 
   const {
@@ -29,7 +27,7 @@ export default function ChangePassword() {
       user: serachParams.get("user") || undefined,
       token: serachParams.get("token") || undefined,
     },
-    resolver: zodResolver(resetPasswordInputDefinition),
+    // resolver: zodResolver(resetPasswordInputDefinition),
     shouldFocusError: false,
     mode: "onBlur",
   });
@@ -49,7 +47,11 @@ export default function ChangePassword() {
       },
       {
         onSuccess() {
-          console.log("Exito");
+          router.push("/login");
+          showToast({
+            label: "Contraseña cambiada exitosamente",
+            type: "success",
+          });
         },
       },
     );

@@ -24,7 +24,7 @@ export function PlayerInput({
         >
           <TextInput
             placeholder="Type here"
-            topLeftLabel="Ingrese nombre del otro jugador:"
+            topLeftLabel="Ingrese nombre del jugador:"
             value={text || ""}
             onChange={(e) => handleSearch(i, e.target.value)}
             bottomLeftLabel={
