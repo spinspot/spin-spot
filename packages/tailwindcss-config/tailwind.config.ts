@@ -23,12 +23,17 @@ const config: TailwindConfig = {
           "0%": { opacity: "1" },
           "100%": { opacity: "0" },
         },
+        shine: {
+          "0%": { backgroundPosition: "-100% center" },
+          "100%": { backgroundPosition: "200% center" },
+        },
       },
       animation: {
         "fade-in-left": "fade-in-left 0.5s ease-in-out",
         "fade-out-left": "fade-out-left 0.5s ease-in-out",
         "slide-down": "slide-down 0.5s ease-in-out",
         "slide-up": "slide-up 0.5s ease-in-out",
+        shine: "shine 6s linear infinite",
       },
       fontFamily: {
         sans: ["var(--font-body)", ...defaultTheme.fontFamily.sans],

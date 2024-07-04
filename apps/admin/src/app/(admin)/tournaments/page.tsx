@@ -1,19 +1,26 @@
 "use client";
 
 import { Button, Card, Loader } from "@spin-spot/components";
-import { useTournaments } from "@spin-spot/services";
+import { useNotClosedTournaments } from "@spin-spot/services";
 import { useRouter } from "next/navigation";
 
 export default function Tournaments() {
   const router = useRouter();
-  const { data: tournaments, isLoading } = useTournaments();
+  const { data: tournaments, isLoading } = useNotClosedTournaments();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader variant="dots" size="lg" className="text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-grow">
       <div className="font-title text-center font-bold">
         <h1 className="flex flex-col text-3xl">
-          <span>Torneos</span>
-          <span>UNIMET</span>
+          <span>Torneos SpinSpot</span>
         </h1>
       </div>
       <div className="mt-4 flex items-center justify-center gap-4">

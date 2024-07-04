@@ -13,7 +13,12 @@ import {
   Loader,
   PingPongIcon,
 } from "@spin-spot/components";
-import { useTournament, useTournamentParticipants } from "@spin-spot/services";
+import {
+  useToast,
+  useTournament,
+  useTournamentParticipants,
+  useUpdateTournament,
+} from "@spin-spot/services";
 import { useRouter } from "next/navigation";
 
 interface TournamentParams {
@@ -28,14 +33,62 @@ export default function TournamentInfo({
   const router = useRouter();
   const tournament = useTournament(params.tournamentId);
   const tournamentData = tournament.data;
+  const updateTournament = useUpdateTournament();
+  const { showToast } = useToast();
 
   const { data: participants, isLoading } = useTournamentParticipants(
     params.tournamentId,
   );
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader variant="dots" size="lg" className="text-primary" />
+      </div>
+    );
   }
+
+  const handleDeleteTournament = () => {
+    if (!tournamentData) return;
+
+    updateTournament.mutate(
+      { _id: tournamentData._id, status: "FINISHED" },
+      {
+        onSuccess: () => {
+          showToast({
+            label: "El torneo ha sido marcado como terminado.",
+            type: "success",
+            duration: 3000,
+          });
+          router.push("/tournaments");
+        },
+        onError: (error) => {
+          showToast({
+            label: error.message,
+            type: "error",
+            duration: 3000,
+          });
+        },
+      },
+    );
+  };
+
+  const confirmDeleteTournament = () => {
+    showToast({
+      label: "¿Estás seguro de que deseas eliminar este torneo?",
+      type: "warning",
+      acceptButtonLabel: "Sí",
+      denyButtonLabel: "No",
+      onAccept: handleDeleteTournament,
+      onDeny: () => {
+        showToast({
+          label: "Eliminación cancelada",
+          type: "error",
+          duration: 3000,
+        });
+      },
+    });
+  };
 
   const renderParticipants = () => {
     if (!tournamentData || !participants) return null;
@@ -71,8 +124,10 @@ export default function TournamentInfo({
           <tbody>
             {participants.map((team: any) => (
               <tr key={team._id}>
-                <td className="border px-4 py-2 text-lg">{team.name}</td>
-                <td className="border px-4 py-2 text-lg">
+                <td className="border-primary border-2 px-4 py-2 text-lg">
+                  {team.name}
+                </td>
+                <td className="border-primary border-2 px-4 py-2 text-lg">
                   {team.players.map((player: any) => (
                     <div key={player._id}>
                       {player.firstName} {player.lastName}
@@ -90,7 +145,7 @@ export default function TournamentInfo({
   };
 
   return (
-    <div className="font-body h-screen flex-grow items-center justify-center py-20 text-center ">
+    <div className="font-body flex-grow items-center justify-center py-20 text-center ">
       <h1 className="flex flex-col text-3xl font-bold">
         Información del Torneo 🏆
       </h1>
@@ -168,27 +223,28 @@ export default function TournamentInfo({
         )}
       </div>
       <div className="mt-4 flex items-center justify-center gap-4">
-        <h3 className="text-xl font-semibold">Participantes: </h3>
+        <h3 className="text-3xl font-bold">Participantes: </h3>
       </div>
-      <div className="mt-4 flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center px-10 py-4 lg:px-60">
         {renderParticipants()}
       </div>
-
-      <div className="mt-8 flex items-center justify-center gap-5 pb-4">
-        <Button
-          className="btn-primary "
-          label="Volver a Torneos"
-          onClick={() => router.push(`/tournaments`)}
-        />
+      <div className="mt-8 flex w-full flex-col gap-3 px-10 lg:px-60">
         <Button
           className="btn-primary"
           label="Editar Torneo"
-          onClick={() => console.log("Editar Torneo")}
+          onClick={() =>
+            router.push(`/tournaments/update-tournament/${params.tournamentId}`)
+          }
         />
         <Button
           className="btn-secondary"
           label="Eliminar Torneo"
-          onClick={() => console.log("Eliminar Torneo")}
+          onClick={confirmDeleteTournament}
+        />
+        <Button
+          className="btn-md btn-link text-secondary mx-auto !no-underline"
+          label="Ir a Torneos"
+          onClick={() => router.push(`/tournaments`)}
         />
       </div>
     </div>

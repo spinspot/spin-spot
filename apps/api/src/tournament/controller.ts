@@ -41,6 +41,84 @@ async function getTournament(req: Request, res: Response) {
 async function updateTournament(req: Request, res: Response) {
   const params = updateTournamentParamsDefinition.parse(req.params);
   const input = updateTournamentInputDefinition.parse(req.body);
+  const currentTournament = await tournamentService.getTournament(params._id);
+
+  const currentTime = new Date();
+  if (currentTime > (input.startTime ?? new Date())) {
+    throw new ApiError({
+      status: 400,
+      errors: [{ message: "Fecha invalida para crear el torneo" }],
+    });
+  }
+
+  if (currentTournament?.eventType === "1V1") {
+    const currentPlayersCount = currentTournament?.players?.length ?? 0;
+    const maxPlayers = input.maxPlayers;
+
+    if (maxPlayers !== undefined) {
+      if (maxPlayers <= 0) {
+        throw new ApiError({
+          status: 400,
+          errors: [
+            {
+              message: "El número máximo de jugadores debe ser mayor que cero",
+            },
+          ],
+        });
+      }
+
+      if (currentPlayersCount > maxPlayers) {
+        throw new ApiError({
+          status: 400,
+          errors: [
+            {
+              message: `No puedes reducir el número de jugadores a menos de ${currentPlayersCount}`,
+            },
+          ],
+        });
+      }
+    }
+  }
+
+  if (currentTournament?.eventType === "2V2") {
+    const currentTeamsCount = currentTournament?.teams?.length ?? 0;
+    const maxTeams = input.maxTeams;
+
+    if (maxTeams !== undefined) {
+      if (maxTeams <= 0) {
+        throw new ApiError({
+          status: 400,
+          errors: [
+            { message: "El número máximo de equipos debe ser mayor que cero" },
+          ],
+        });
+      }
+
+      if (currentTeamsCount > maxTeams) {
+        throw new ApiError({
+          status: 400,
+          errors: [
+            {
+              message: `No puedes reducir el número de equipos a menos de ${currentTeamsCount}`,
+            },
+          ],
+        });
+      }
+    }
+  }
+
+  if ((input.startTime ?? new Date()) > (input.endTime ?? new Date())) {
+    throw new ApiError({
+      status: 400,
+      errors: [
+        {
+          message:
+            "La fecha de finalización no puede ser antes que la de inicio",
+        },
+      ],
+    });
+  }
+
   const tournament = await tournamentService.updateTournament(
     params._id,
     input,
@@ -165,6 +243,12 @@ async function getTournamentParticipants(req: Request, res: Response) {
   return res.status(200).json(participants);
 }
 
+async function getUserTournaments(req: Request, res: Response) {
+  const userId = req.params.userId;
+  const tournaments = await tournamentService.getUserTournaments(userId);
+  return res.status(200).json(tournaments);
+}
+
 export const tournamentController = {
   getTournament,
   getTournaments,
@@ -173,4 +257,5 @@ export const tournamentController = {
   joinTournament,
   leaveTournament,
   getTournamentParticipants,
+  getUserTournaments,
 } as const;
