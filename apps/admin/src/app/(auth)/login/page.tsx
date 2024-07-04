@@ -15,7 +15,6 @@ import { useScrollLock } from "usehooks-ts";
 export default function Login() {
   const router = useRouter();
   const signInWithCredentials = useSignInWithCredentials();
-
   useScrollLock();
 
   const {
@@ -82,7 +81,7 @@ export default function Login() {
           label="Iniciar Sesión"
           labelSize="text-md"
           onClick={handleSubmit(handleSignIn)}
-          isLoading={!signInWithCredentials.isIdle}
+          isLoading={signInWithCredentials.isPending}
           isLoadinglabel="Iniciando Sesión..."
         />
         <div className="flex justify-center">
