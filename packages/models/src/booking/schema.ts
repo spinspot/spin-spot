@@ -7,7 +7,6 @@ export const bookingSchema = new Schema<IBooking>(
     owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
     table: {
       type: Schema.Types.ObjectId,

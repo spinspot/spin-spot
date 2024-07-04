@@ -109,6 +109,13 @@ function signInWithCredentials(
         });
       }
 
+      if (req.body.userType === "ADMIN" && user.userType !== "ADMIN") {
+          throw new ApiError({
+            status: 403,
+            errors: [{ message: "No tienes permisos de administrador" }],
+          });
+      }
+
       const token = authService.signJWT(user);
 
       return res.status(200).send({

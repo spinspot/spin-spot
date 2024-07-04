@@ -2,6 +2,8 @@ import {
   createTableInputDefinition,
   getTableParamsDefinition,
   getTablesQueryDefinition,
+  updateTableInputDefinition,
+  updateTableParamsDefinition,
 } from "@spin-spot/models";
 import { Request, Response } from "express";
 import { tableService } from "./service";
@@ -24,8 +26,16 @@ async function getTable(req: Request, res: Response) {
   return res.status(200).json(table);
 }
 
+async function updateTable(req: Request, res: Response) {
+  const params = updateTableParamsDefinition.parse(req.params);
+  const input = updateTableInputDefinition.parse(req.body);
+  const table = await tableService.updateTable(params._id, input);
+  return res.status(200).json(table);
+}
+
 export const tableController = {
   getTable,
   getTables,
   createTable,
+  updateTable,
 } as const;

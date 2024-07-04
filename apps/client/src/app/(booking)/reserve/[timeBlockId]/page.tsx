@@ -237,6 +237,7 @@ export default function Reserve({ params }: { params: ReserveParams }) {
         />
       )}
       <SelectionSection
+        isAdmin={null}
         options={options}
         optinosNo={optinosNo}
         eventType={eventType}
@@ -285,13 +286,17 @@ export default function Reserve({ params }: { params: ReserveParams }) {
               : "btn-primary btn-md btn-disabled"
           }
           onClick={handleReserve}
+          isLoading={!createBooking.isIdle}
+          isLoadinglabel="Reservando..."
         />
-        <Button
-          label="Cancelar"
-          labelSize="text-sm"
-          className="btn-md btn-link text-secondary mx-auto !no-underline"
-          onClick={() => router.back()}
-        />
+        {createBooking.isIdle && (
+          <Button
+            label="Cancelar"
+            labelSize="text-sm"
+            className="btn-md btn-link text-secondary mx-auto !no-underline"
+            onClick={() => router.back()}
+          />
+        )}
       </div>
     </div>
   );

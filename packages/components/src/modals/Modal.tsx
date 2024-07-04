@@ -7,6 +7,7 @@ import { cn } from "@spin-spot/utils";
 import { useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Button } from "../buttons";
+import { Loader } from "../loaders";
 import { TextInput } from "../text-inputs";
 
 interface ModalProps {
@@ -19,6 +20,7 @@ interface ModalProps {
   handleSearch: (_index: number, _text: string) => void;
   handleSelectUser: (_index: number, _user: any) => void;
   onClick: () => void;
+  isPending?: boolean;
 }
 
 export function Modal({
@@ -31,6 +33,7 @@ export function Modal({
   handleSearch,
   handleSelectUser,
   onClick,
+  isPending,
 }: ModalProps) {
   const {
     register,
@@ -67,9 +70,16 @@ export function Modal({
   return (
     <>
       {/* The button to open modal */}
-      <label htmlFor="my_modal_6" className="btn btn-primary btn-lg w-72">
-        Inscribirse
-      </label>
+      {isPending ? (
+        <label htmlFor="my_modal_6" className="btn btn-disabled btn-lg w-72">
+          <Loader />
+          Inscribiendose...
+        </label>
+      ) : (
+        <label htmlFor="my_modal_6" className="btn btn-primary btn-lg w-72">
+          Inscribirse
+        </label>
+      )}
 
       {/* Put this part before </body> tag */}
       <input

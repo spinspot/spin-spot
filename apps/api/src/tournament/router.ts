@@ -16,7 +16,16 @@ tournamentRouter.post(
 tournamentRouter.post(
   "/:_id/leave",
   auth(),
-  tournamentController.leaveTournament
+  tournamentController.leaveTournament,
 );
+tournamentRouter.get(
+  "/:_id/participants",
+  tournamentController.getTournamentParticipants,
+);
+tournamentRouter.get(
+  "/user/:userId",
+  tournamentController.getUserTournaments,
+);
+
 
 export { tournamentRouter };

@@ -1,6 +1,8 @@
 import {
   TCreateTableInputDefinition,
   TGetTablesQueryDefinition,
+  TUpdateTableInputDefinition,
+  TUpdateTableParamsDefinition,
   tableSchema,
 } from "@spin-spot/models";
 import { model } from "mongoose";
@@ -22,8 +24,17 @@ async function createTable(data: TCreateTableInputDefinition) {
   return table;
 }
 
+async function updateTable(
+  _id: TUpdateTableParamsDefinition["_id"],
+  data: TUpdateTableInputDefinition,
+) {
+  const table = await Table.findByIdAndUpdate(_id, data, { new: true });
+  return table;
+}
+
 export const tableService = {
   getTables,
   getTable,
   createTable,
+  updateTable,
 } as const;
