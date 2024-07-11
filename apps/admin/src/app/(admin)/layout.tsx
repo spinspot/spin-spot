@@ -16,7 +16,7 @@ export default function AdminLayout({
   const signOut = useSignOut();
 
   useEffect(() => {
-    if (!auth.isLoading && auth.user?.userType !== "ADMIN") {
+    if (!auth.isLoading && auth.user && auth.user?.userType !== "ADMIN") {
       signOut.mutate();
       showToast({
         label: "No tienes permisos para entrar",

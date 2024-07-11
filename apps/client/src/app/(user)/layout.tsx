@@ -16,7 +16,7 @@ export default function UserLayout({
   const signOut = useSignOut();
 
   useEffect(() => {
-    if (!auth.isLoading && auth.user?.userType !== "PLAYER") {
+    if (!auth.isLoading && auth.user && auth.user?.userType !== "PLAYER") {
       signOut.mutate();
       showToast({
         label: "No tienes permisos para entrar",
@@ -31,7 +31,12 @@ export default function UserLayout({
   }
   return (
     <LayoutMain>
-      <AuthGuard>{children}</AuthGuard>
+      <AuthGuard
+        validate={(user) => user?.userType === "PLAYER"}
+        route="/login"
+      >
+        {children}
+      </AuthGuard>
     </LayoutMain>
   );
 }
