@@ -4,10 +4,15 @@ import { baseModelDefinition } from "../definitions";
 const tableDefinition = baseModelDefinition.extend({
   code: z
     .string()
+    .max(5, { message: "El código no puede tener más de 5 caracteres" })
     .nonempty("El código no puede estar vacío")
     .refine((val) => !isNaN(Number(val)), {
       message: "El código debe ser un número",
+    })
+    .refine((val) => val.trim().length > 0, {
+      message: "El código no puede contener espacios en blanco",
     }),
+
   isActive: z.boolean(),
 });
 

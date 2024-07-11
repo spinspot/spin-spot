@@ -15,8 +15,8 @@ import {
 import {
   useAuth,
   useBookings,
+  useNotClosedTournaments,
   useTables,
-  useTournaments,
   useUsers,
 } from "@spin-spot/services";
 import { useRouter } from "next/navigation";
@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation";
 export default function dashboard() {
   const users = useUsers();
   const { user } = useAuth();
-  const tournaments = useTournaments();
+  const tournaments = useNotClosedTournaments();
   const tables = useTables();
   const bookings = useBookings();
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function dashboard() {
       icon: <TrophyIcon className="inline-block h-8 w-8 stroke-current" />,
       title: "Torneos Creados",
       value: tournaments.data?.length,
-      description: "↗︎ 400 (22%)",
+      description: "Since 2024",
       isLoading: tournaments.isLoading,
     },
     {
@@ -49,14 +49,14 @@ export default function dashboard() {
       ),
       title: "Mesas Registradas",
       value: tables.data?.length,
-      description: "↘︎ 90 (14%)",
+      description: "Since 2024",
       isLoading: tables.isLoading,
     },
     {
       icon: <ChartBarIcon className="inline-block h-8 w-8 stroke-current" />,
       title: "Reservas Realizadas",
       value: bookings.data?.length,
-      description: "↘︎ 90 (14%)",
+      description: "Since 2024",
       isLoading: bookings.isLoading,
     },
   ];
@@ -102,7 +102,7 @@ export default function dashboard() {
               <>
                 {tournaments.data &&
                   tournaments.data
-                    .slice(0, 4)
+                    .slice(0, 5)
                     .map((tournament, index) => (
                       <Card
                         key={index}
@@ -145,7 +145,7 @@ export default function dashboard() {
               <>
                 {tables.data &&
                   tables.data
-                    .slice(0, 4)
+                    .slice(0, 5)
                     .map((table, index) => (
                       <Card
                         key={index}
